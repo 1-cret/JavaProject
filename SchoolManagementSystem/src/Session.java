@@ -1,8 +1,9 @@
-
+import java.io.Serializable;
 import java.util.*;
 
-public class Session {
+public class Session implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private static int sessionCounter = 0;
     private int sessionID;
     private Module module;

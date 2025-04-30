@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author omarhashad
+ * @author Osama
  */
 public class AdminView extends javax.swing.JFrame {
 

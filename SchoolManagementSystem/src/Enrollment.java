@@ -1,8 +1,9 @@
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Enrollment implements IEnrollment {
+public class Enrollment implements IEnrollment, Serializable {
 
+    private static final long serialVersionUID = 1L;
     private static int enrollmentCounter = 0;
     private int enrollmentID;
     private Student student;

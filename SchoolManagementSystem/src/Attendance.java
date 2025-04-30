@@ -1,8 +1,10 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-public class Attendance {
+public class Attendance implements Serializable {
+    private static final long serialVersionUID = 1L;
     private int attendanceId;
     private Student student;
     private Session session;

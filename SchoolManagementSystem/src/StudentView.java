@@ -6,7 +6,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author CS
+ * @author Osama
  */
 public class StudentView extends javax.swing.JFrame {
 

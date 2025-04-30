@@ -1,8 +1,9 @@
-
+import java.io.Serializable;
 import java.util.*;
 
-public class Module {
+public class Module implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private static int moduleCounter = 0;
     private int moduleID;
     private String moduleName;

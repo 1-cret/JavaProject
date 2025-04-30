@@ -1,8 +1,9 @@
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Classroom {
+public class Classroom implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private static int classroomCounter = 0;
     private int classroomId;
     private String roomName;

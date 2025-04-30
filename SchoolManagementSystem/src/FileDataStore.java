@@ -1,4 +1,3 @@
-
 import java.io.*;
 import java.util.ArrayList;
 
@@ -27,38 +26,19 @@ public class FileDataStore {
         try {
             File file = new File(STUDENTS_FILE);
             if (!file.exists()) {
-
                 file.createNewFile();
-
                 System.out.println("No student data found.");
                 return students;
             }
 
-            DataInputStream input = new DataInputStream(new FileInputStream(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println("Loading student data: " + line);
-                String[] data = line.split(",");
-                if (data.length >= 5) {
-                    int studentID = Integer.parseInt(data[0]);
-                    String name = data[1];
-                    String email = data[2];
-                    String password = data[3];
-                    float annualFee = Float.parseFloat(data[4]);
-                    int year = Integer.parseInt(data[5]);
-
-                    Student student = new Student(name, email, annualFee, year, password);
-
-                    students.add(student);
-                }
-            }
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            students = (ArrayList<Student>) ois.readObject();
+            ois.close();
+            fis.close();
             System.out.println("Student data loaded successfully.");
-            reader.close();
-            input.close();
 
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error loading students: " + e.getMessage());
         }
         return students;
@@ -66,23 +46,11 @@ public class FileDataStore {
 
     public static void saveStudents(ArrayList<Student> students) {
         try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(STUDENTS_FILE));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-            for (Student student : students) {
-                String line = student.getStudentID() + ","
-                        + student.getName() + ","
-                        + student.getEmail() + ","
-                        + student.getPassword() + ","
-                        + student.getAnnualFee() + ","
-                        + student.getYear();
-                writer.write(line);
-                writer.newLine();
-            }
-
-            writer.close();
-            output.close();
-
+            FileOutputStream fos = new FileOutputStream(STUDENTS_FILE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(students);
+            oos.close();
+            fos.close();
         } catch (IOException e) {
             System.err.println("Error saving students: " + e.getMessage());
         }
@@ -96,27 +64,13 @@ public class FileDataStore {
                 return admins;
             }
 
-            DataInputStream input = new DataInputStream(new FileInputStream(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            admins = (ArrayList<Admin>) ois.readObject();
+            ois.close();
+            fis.close();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length >= 4) {
-                    int staffId = Integer.parseInt(data[0]);
-                    String name = data[1];
-                    String email = data[2];
-                    String password = data[3];
-                    StaffStatus status = StaffStatus.valueOf(data[4]);
-                    String role = "admin";
-                    Admin admin = new Admin(name, email, role, status, password);
-                    admins.add(admin);
-                }
-            }
-            reader.close();
-            input.close();
-
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error loading admins: " + e.getMessage());
         }
         return admins;
@@ -124,22 +78,11 @@ public class FileDataStore {
 
     public static void saveAdmins(ArrayList<Admin> admins) {
         try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(ADMINS_FILE));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-            for (Admin admin : admins) {
-                String line = admin.getStaffId() + ","
-                        + admin.getName() + ","
-                        + admin.getEmail() + ","
-                        + admin.getPassword() + ","
-                        + admin.getStatus();
-                writer.write(line);
-                writer.newLine();
-            }
-
-            writer.close();
-            output.close();
-
+            FileOutputStream fos = new FileOutputStream(ADMINS_FILE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(admins);
+            oos.close();
+            fos.close();
         } catch (IOException e) {
             System.err.println("Error saving admins: " + e.getMessage());
         }
@@ -153,30 +96,13 @@ public class FileDataStore {
                 return modules;
             }
 
-            DataInputStream input = new DataInputStream(new FileInputStream(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            modules = (ArrayList<Module>) ois.readObject();
+            ois.close();
+            fis.close();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println("Loading module data: " + line);
-                String[] data = line.split(",");
-                if (data.length >= 4) {
-                    int moduleID = Integer.parseInt(data[0]);
-                    String moduleName = data[1];
-                    int maxCapacity = Integer.parseInt(data[2]);
-                    int moduleYear = Integer.parseInt(data[3]);
-
-                    ArrayList<Assessment> assessments = new ArrayList<>();
-
-                    Module module = new Module(moduleName, maxCapacity, assessments, moduleYear);
-                    module.setModuleID(moduleID);
-                    modules.add(module);
-                }
-            }
-            reader.close();
-            input.close();
-
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error loading modules: " + e.getMessage());
         }
         return modules;
@@ -184,21 +110,11 @@ public class FileDataStore {
 
     public static void saveModules(ArrayList<Module> modules) {
         try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(MODULES_FILE));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-            for (Module module : modules) {
-                String line = module.getModuleID() + ","
-                        + module.getModuleName() + ","
-                        + module.getMaxCapacity() + ","
-                        + module.getModuleYear();
-                writer.write(line);
-                writer.newLine();
-            }
-
-            writer.close();
-            output.close();
-
+            FileOutputStream fos = new FileOutputStream(MODULES_FILE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(modules);
+            oos.close();
+            fos.close();
         } catch (IOException e) {
             System.err.println("Error saving modules: " + e.getMessage());
         }
@@ -212,26 +128,13 @@ public class FileDataStore {
                 return classrooms;
             }
 
-            DataInputStream input = new DataInputStream(new FileInputStream(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            classrooms = (ArrayList<Classroom>) ois.readObject();
+            ois.close();
+            fis.close();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length >= 3) {
-                    int classroomId = Integer.parseInt(data[0]);
-                    String roomName = data[1];
-                    int capacity = Integer.parseInt(data[2]);
-
-                    Classroom classroom = new Classroom(roomName, capacity);
-                    classrooms.add(classroom);
-                    classroom.setClassroomId(classroomId);
-                }
-            }
-            reader.close();
-            input.close();
-
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error loading classrooms: " + e.getMessage());
         }
         return classrooms;
@@ -239,20 +142,11 @@ public class FileDataStore {
 
     public static void saveClassrooms(ArrayList<Classroom> classrooms) {
         try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(CLASSROOMS_FILE));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-            for (Classroom classroom : classrooms) {
-                String line = classroom.getClassroomId() + ","
-                        + classroom.getRoomName() + ","
-                        + classroom.getCapacity();
-                writer.write(line);
-                writer.newLine();
-            }
-
-            writer.close();
-            output.close();
-
+            FileOutputStream fos = new FileOutputStream(CLASSROOMS_FILE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(classrooms);
+            oos.close();
+            fos.close();
         } catch (IOException e) {
             System.err.println("Error saving classrooms: " + e.getMessage());
         }
@@ -266,27 +160,13 @@ public class FileDataStore {
                 return teachers;
             }
 
-            DataInputStream input = new DataInputStream(new FileInputStream(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            teachers = (ArrayList<Teacher>) ois.readObject();
+            ois.close();
+            fis.close();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length >= 4) {
-                    int staffId = Integer.parseInt(data[0]);
-                    String name = data[1];
-                    String email = data[2];
-                    String password = data[3];
-                    StaffStatus status = StaffStatus.valueOf(data[4]);
-                    String role = "teacher";
-                    Teacher teacher = new Teacher(name, email, role, status, password);
-                    teachers.add(teacher);
-                }
-            }
-            reader.close();
-            input.close();
-
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error loading teachers: " + e.getMessage());
         }
         return teachers;
@@ -294,22 +174,11 @@ public class FileDataStore {
 
     public static void saveTeachers(ArrayList<Teacher> teachers) {
         try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(TEACHERS_FILE));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-            for (Teacher teacher : teachers) {
-                String line = teacher.getStaffId() + ","
-                        + teacher.getName() + ","
-                        + teacher.getEmail() + ","
-                        + teacher.getPassword() + ","
-                        + teacher.getStatus();
-                writer.write(line);
-                writer.newLine();
-            }
-
-            writer.close();
-            output.close();
-
+            FileOutputStream fos = new FileOutputStream(TEACHERS_FILE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(teachers);
+            oos.close();
+            fos.close();
         } catch (IOException e) {
             System.err.println("Error saving teachers: " + e.getMessage());
         }
@@ -317,87 +186,20 @@ public class FileDataStore {
 
     public static ArrayList<Session> loadSessions() {
         ArrayList<Session> sessions = new ArrayList<>();
-        ArrayList<Module> modules = loadModules();
-        ArrayList<Classroom> classrooms = loadClassrooms();
-        ArrayList<Student> students = loadStudents();
-
         try {
             File file = new File(SESSIONS_FILE);
             if (!file.exists()) {
                 return sessions;
             }
 
-            DataInputStream input = new DataInputStream(new FileInputStream(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            sessions = (ArrayList<Session>) ois.readObject();
+            ois.close();
+            fis.close();
+            System.out.println("Sessions loaded successfully.");
 
-            String line;
-            System.out.println("Loading sessions...");
-            while ((line = reader.readLine()) != null) {
-                System.out.println("Loading session data: " + line);
-                String[] data = line.split(",");
-                if (data.length >= 7) {
-                    System.out.println("Data length: " + data.length);
-                    int sessionID = Integer.parseInt(data[0]);
-                    int moduleID = Integer.parseInt(data[1]);
-                    String sessionName = data[2];
-                    String startTime = data[3];
-                    String endTime = data[4];
-                    int classroomID = Integer.parseInt(data[5]);
-                    String status = data[6];
-
-                    Module module = null;
-                    Classroom classroom = null;
-
-                    for (Module m : modules) {
-
-                        if (m.getModuleID() == moduleID) {
-                            module = m;
-                            break;
-                        }
-                    }
-
-                    for (Classroom c : classrooms) {
-
-                        if (c.getClassroomId() == classroomID) {
-                            classroom = c;
-                            break;
-                        }
-                    }
-                    System.out.println("Module: " + module + ", Classroom: " + classroom);
-
-                    if (module != null && classroom != null) {
-                        System.out.println("Module and classroom found.");
-
-                        ArrayList<Student> attendees = new ArrayList<>();
-                        if (data.length > 7 && !data[7].isEmpty()) {
-                            System.out.println("Loading attendees...");
-                            String[] attendeeIds = data[7].split(":");
-                            for (String idStr : attendeeIds) {
-                                try {
-                                    int studentId = Integer.parseInt(idStr);
-
-                                    for (Student s : students) {
-                                        if (s.getStudentID() == studentId) {
-                                            attendees.add(s);
-                                            break;
-                                        }
-                                    }
-                                } catch (NumberFormatException e) {
-                                    System.err.println("Invalid student ID format: " + idStr);
-                                }
-                            }
-                        }
-
-                        Session session = new Session(module, sessionName, startTime, endTime, classroom, attendees, status);
-                        System.out.println("Loading session data: " + session);
-                        sessions.add(session);
-                    }
-                }
-            }
-            reader.close();
-            input.close();
-
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error loading sessions: " + e.getMessage());
         }
         return sessions;
@@ -409,94 +211,18 @@ public class FileDataStore {
 
     public static void saveSessions(ArrayList<Session> sessions) {
         try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(SESSIONS_FILE));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-            for (Session session : sessions) {
-
-                StringBuilder attendeeBuilder = new StringBuilder();
-                ArrayList<Student> attendees = session.getAttendees();
-                if (attendees != null && !attendees.isEmpty()) {
-                    for (int i = 0; i < attendees.size(); i++) {
-                        if (i > 0) {
-                            attendeeBuilder.append(":");
-                        }
-                        attendeeBuilder.append(attendees.get(i).getStudentID());
-                    }
-                }
-
-                String line = session.getSessionID() + ","
-                        + session.getModule().getModuleID() + ","
-                        + session.getSessionName() + ","
-                        + session.getStartTime() + ","
-                        + session.getEndTime() + ","
-                        + session.getClassroom().getClassroomId() + ","
-                        + session.getStatus() + ","
-                        + attendeeBuilder.toString();
-                writer.write(line);
-                writer.newLine();
-            }
-
-            writer.close();
-            output.close();
-
+            FileOutputStream fos = new FileOutputStream(SESSIONS_FILE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(sessions);
+            oos.close();
+            fos.close();
         } catch (IOException e) {
             System.err.println("Error saving sessions: " + e.getMessage());
         }
     }
 
     public static ArrayList<Enrollment> loadEnrollments(ArrayList<Student> students, ArrayList<Module> modules) {
-        ArrayList<Enrollment> enrollments = new ArrayList<>();
-        try {
-            File file = new File(ENROLLMENTS_FILE);
-            if (!file.exists()) {
-                return enrollments;
-            }
-
-            DataInputStream input = new DataInputStream(new FileInputStream(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length >= 5) {
-                    int enrollmentID = Integer.parseInt(data[0]);
-                    int studentID = Integer.parseInt(data[1]);
-                    int moduleID = Integer.parseInt(data[2]);
-                    Status status = Status.valueOf(data[3]);
-                    float grade = Float.parseFloat(data[4]);
-
-                    Student student = null;
-                    Module module = null;
-
-                    for (Student s : students) {
-                        if (s.getStudentID() == studentID) {
-                            student = s;
-                            break;
-                        }
-                    }
-
-                    for (Module m : modules) {
-                        if (m.getModuleID() == moduleID) {
-                            module = m;
-                            break;
-                        }
-                    }
-
-                    if (student != null && module != null) {
-                        Enrollment enrollment = new Enrollment(student, module, status);
-                        enrollment.setGrade(grade);
-                        enrollments.add(enrollment);
-                    }
-                }
-            }
-            reader.close();
-            input.close();
-
-        } catch (IOException e) {
-            System.err.println("Error loading enrollments: " + e.getMessage());
-        }
-        return enrollments;
+        return loadEnrollments();
     }
 
     /**
@@ -506,35 +232,42 @@ public class FileDataStore {
      * @return ArrayList of Enrollment objects
      */
     public static ArrayList<Enrollment> loadEnrollments() {
-        ArrayList<Student> students = loadStudents();
-        ArrayList<Module> modules = loadModules();
-        return loadEnrollments(students, modules);
+        ArrayList<Enrollment> enrollments = new ArrayList<>();
+        try {
+            File file = new File(ENROLLMENTS_FILE);
+            if (!file.exists()) {
+                return enrollments;
+            }
+
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            enrollments = (ArrayList<Enrollment>) ois.readObject();
+            ois.close();
+            fis.close();
+
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error loading enrollments: " + e.getMessage());
+        }
+        return enrollments;
     }
 
     public static void saveEnrollments(ArrayList<Enrollment> enrollments) {
         try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(ENROLLMENTS_FILE));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-            for (Enrollment enrollment : enrollments) {
-                String line = enrollment.getEnrollmentID() + ","
-                        + enrollment.getStudent().getStudentID() + ","
-                        + enrollment.getModule().getModuleID() + ","
-                        + enrollment.getEnrollmentStatus() + ","
-                        + enrollment.getGrade();
-                writer.write(line);
-                writer.newLine();
-            }
-
-            writer.close();
-            output.close();
-
+            FileOutputStream fos = new FileOutputStream(ENROLLMENTS_FILE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(enrollments);
+            oos.close();
+            fos.close();
         } catch (IOException e) {
             System.err.println("Error saving enrollments: " + e.getMessage());
         }
     }
 
     public static ArrayList<Payment> loadPayments(ArrayList<Student> students) {
+        return loadPayments();
+    }
+    
+    public static ArrayList<Payment> loadPayments() {
         ArrayList<Payment> payments = new ArrayList<>();
         try {
             File file = new File(PAYMENTS_FILE);
@@ -542,37 +275,13 @@ public class FileDataStore {
                 return payments;
             }
 
-            DataInputStream input = new DataInputStream(new FileInputStream(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            payments = (ArrayList<Payment>) ois.readObject();
+            ois.close();
+            fis.close();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length >= 5) {
-                    int paymentID = Integer.parseInt(data[0]);
-                    float amount = Float.parseFloat(data[1]);
-                    int studentID = Integer.parseInt(data[2]);
-                    String description = data[3];
-                    String date = data[4];
-
-                    Student student = null;
-                    for (Student s : students) {
-                        if (s.getStudentID() == studentID) {
-                            student = s;
-                            break;
-                        }
-                    }
-
-                    if (student != null) {
-                        Payment payment = new Payment(amount, student, description, date);
-                        payments.add(payment);
-                    }
-                }
-            }
-            reader.close();
-            input.close();
-
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error loading payments: " + e.getMessage());
         }
         return payments;
@@ -580,22 +289,11 @@ public class FileDataStore {
 
     public static void savePayments(ArrayList<Payment> payments) {
         try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(PAYMENTS_FILE));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-            for (Payment payment : payments) {
-                String line = payment.getPaymentID() + ","
-                        + payment.getAmount() + ","
-                        + payment.getPayeeId().getStudentID() + ","
-                        + payment.getDescription() + ","
-                        + payment.getDate();
-                writer.write(line);
-                writer.newLine();
-            }
-
-            writer.close();
-            output.close();
-
+            FileOutputStream fos = new FileOutputStream(PAYMENTS_FILE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(payments);
+            oos.close();
+            fos.close();
         } catch (IOException e) {
             System.err.println("Error saving payments: " + e.getMessage());
         }
@@ -603,56 +301,19 @@ public class FileDataStore {
 
     public static ArrayList<Attendance> loadAttendance() {
         ArrayList<Attendance> attendanceList = new ArrayList<>();
-        ArrayList<Student> students = loadStudents();
-        ArrayList<Session> sessions = loadSessions();
-
         try {
             File file = new File(ATTENDANCE_FILE);
             if (!file.exists()) {
                 return attendanceList;
             }
 
-            DataInputStream input = new DataInputStream(new FileInputStream(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            FileInputStream fis = new FileInputStream(file);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            attendanceList = (ArrayList<Attendance>) ois.readObject();
+            ois.close();
+            fis.close();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length >= 5) {
-                    int attendanceId = Integer.parseInt(data[0]);
-                    int studentId = Integer.parseInt(data[1]);
-                    int sessionId = Integer.parseInt(data[2]);
-                    String date = data[3];
-                    boolean present = Boolean.parseBoolean(data[4]);
-
-                    Student student = null;
-                    Session session = null;
-
-                    for (Student s : students) {
-                        if (s.getStudentID() == studentId) {
-                            student = s;
-                            break;
-                        }
-                    }
-
-                    for (Session s : sessions) {
-                        if (s.getSessionID() == sessionId) {
-                            session = s;
-                            break;
-                        }
-                    }
-
-                    if (student != null && session != null) {
-                        Attendance attendance = new Attendance(student, session, present);
-                        attendance.setDate(date);
-                        attendanceList.add(attendance);
-                    }
-                }
-            }
-            reader.close();
-            input.close();
-
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error loading attendance: " + e.getMessage());
         }
         return attendanceList;
@@ -660,22 +321,11 @@ public class FileDataStore {
 
     public static void saveAttendance(ArrayList<Attendance> attendanceList) {
         try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(ATTENDANCE_FILE));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-
-            for (Attendance attendance : attendanceList) {
-                String line = attendance.getAttendanceId() + ","
-                        + attendance.getStudent().getStudentID() + ","
-                        + attendance.getSession().getSessionID() + ","
-                        + attendance.getDate() + ","
-                        + attendance.isPresent();
-                writer.write(line);
-                writer.newLine();
-            }
-
-            writer.close();
-            output.close();
-
+            FileOutputStream fos = new FileOutputStream(ATTENDANCE_FILE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(attendanceList);
+            oos.close();
+            fos.close();
         } catch (IOException e) {
             System.err.println("Error saving attendance: " + e.getMessage());
         }
