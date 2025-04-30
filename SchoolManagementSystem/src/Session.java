@@ -1,6 +1,8 @@
+
 import java.util.*;
 
 public class Session {
+
     private static int sessionCounter = 0;
     private int sessionID;
     private Module module;
@@ -86,26 +88,27 @@ public class Session {
     public String getStatus() {
         return status;
     }
-    public void addSession(ArrayList<Session> session){
+
+    public void addSession(ArrayList<Session> session) {
         session.add(this);
-        // Persist the data to file
+
         FileDataStore.saveSessions(session);
     }
-    
-    public void removeSession(ArrayList<Session> session){
+
+    public void removeSession(ArrayList<Session> session) {
         session.remove(this);
-        // Persist the data to file
+
         FileDataStore.saveSessions(session);
     }
-    
-    public void updateSession(ArrayList<Session> session){
+
+    public void updateSession(ArrayList<Session> session) {
         for (int i = 0; i < session.size(); i++) {
             if (session.get(i).getSessionID() == this.sessionID) {
                 session.set(i, this);
                 break;
             }
         }
-        // Persist the data to file
+
         FileDataStore.saveSessions(session);
     }
 }

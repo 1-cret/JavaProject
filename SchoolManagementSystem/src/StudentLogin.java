@@ -188,11 +188,11 @@ public class StudentLogin extends javax.swing.JFrame {
         students = FileDataStore.loadStudents();
         for (Student student : students) {
             if (student.getEmail().equals(email) && student.getPassword().equals(password)) {
-                // If a match is found, return the student object
+                
                 return student;
             }
         }
-        return null; // If no match is found, return null
+        return null; 
     }
 
     Teacher teacherLogin(String email, String password) {
@@ -200,11 +200,11 @@ public class StudentLogin extends javax.swing.JFrame {
         teachers = FileDataStore.loadTeachers();
         for (Teacher teacher : teachers) {
             if (teacher.getEmail().equals(email) && teacher.getPassword().equals(password)) {
-                // If a match is found, return the teacher object
+                
                 return teacher;
             }
         }
-        return null; // If no match is found, return null
+        return null; 
     }
 
     Admin adminLogin(String email, String password) {
@@ -212,11 +212,11 @@ public class StudentLogin extends javax.swing.JFrame {
         admins = FileDataStore.loadAdmins();
         for (Admin admin : admins) {
             if (admin.getEmail().equals(email) && admin.getPassword().equals(password)) {
-                // If a match is found, return the admin object
+                
                 return admin;
             }
         }
-        return null; // If no match is found, return null
+        return null; 
     }
 
     private void LoginBtnActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_LoginBtnActionPerformed
@@ -229,10 +229,10 @@ public class StudentLogin extends javax.swing.JFrame {
             if (s == null) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
             } else {
-                // Proceed to student dashboard
+                
                 StudentView studentView = new StudentView(s);
                 studentView.setVisible(true);
-                this.dispose(); // Close the login window
+                this.dispose(); 
             }
         } else if (role.equals("Teacher")) {
             Teacher t = teacherLogin(email, password);

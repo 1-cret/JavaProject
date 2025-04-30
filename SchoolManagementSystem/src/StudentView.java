@@ -6,7 +6,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author GitHub Copilot
+ * @author CS
  */
 public class StudentView extends javax.swing.JFrame {
 
@@ -51,7 +51,7 @@ public class StudentView extends javax.swing.JFrame {
      */
     private void loadEnrolledCourses() {
         DefaultTableModel model = (DefaultTableModel) tblCourses.getModel();
-        model.setRowCount(0); // Clear table
+        model.setRowCount(0); 
 
         ArrayList<Student> students = FileDataStore.loadStudents();
         ArrayList<Module> modules = FileDataStore.loadModules();
@@ -317,11 +317,11 @@ public class StudentView extends javax.swing.JFrame {
             currentStudent.setEmail(newEmail);
         }
 
-        // Update the student information in the data store
+        
         ArrayList<Student> students = FileDataStore.loadStudents();
         currentStudent.manageAccount(students);
 
-        // Refresh the display
+        
         displayStudentInfo();
         JOptionPane.showMessageDialog(this, "Profile updated successfully!");
     }// GEN-LAST:event_btnEditProfileActionPerformed

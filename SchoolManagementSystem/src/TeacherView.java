@@ -11,7 +11,7 @@ import javax.swing.DefaultComboBoxModel;
 
 /**
  *
- * @author Omayr
+ * @author Osama
  */
 public class TeacherView extends javax.swing.JFrame {
     private Teacher currentTeacher;
@@ -36,14 +36,14 @@ public class TeacherView extends javax.swing.JFrame {
         initComponents();
         this.currentTeacher = teacher;
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        // Initialize the collections
+        
         this.sessions = FileDataStore.loadSessions();
         this.students = FileDataStore.loadStudents();
-        // Display teacher information
+        
         displayTeacherInfo();
-        // Load teacher's assigned modules
+        
         loadAssignedModules();
-        // Initialize add attendance button action
+        
         initAttendanceBtn();
     }
     
@@ -65,26 +65,26 @@ public class TeacherView extends javax.swing.JFrame {
     private void loadAssignedModules() {
         if (currentTeacher != null) {
             DefaultTableModel model = (DefaultTableModel) tblCourses1.getModel();
-            // Clear existing rows
+            
             model.setRowCount(0);
             
-            // Load modules from the teacher
+            
             ArrayList<Module> assignedModules = currentTeacher.getAssignedModules();
             
-            // If the teacher doesn't have any modules assigned yet, try to load modules from the system
+            
             if (assignedModules.isEmpty()) {
-                // Load all modules from the system
+                
                 ArrayList<Module> allModules = FileDataStore.loadModules();
                 
-                // Assign all modules to the teacher for demonstration purposes
+                
                 for (Module module : allModules) {
                     currentTeacher.assignModule(module);
                 }
                 
-                // Update the teacher's assigned modules list
+                
                 assignedModules = currentTeacher.getAssignedModules();
                 
-                // Save the updated teacher data
+                
                 ArrayList<Teacher> teachers = FileDataStore.loadTeachers();
                 for (int i = 0; i < teachers.size(); i++) {
                     if (teachers.get(i).getStaffId() == currentTeacher.getStaffId()) {
@@ -95,7 +95,7 @@ public class TeacherView extends javax.swing.JFrame {
                 FileDataStore.saveTeachers(teachers);
             }
             
-            // Add assigned modules to the table
+            
             for (Module module : assignedModules) {
                 model.addRow(new Object[]{
                     module.getModuleID(),
@@ -141,7 +141,7 @@ public class TeacherView extends javax.swing.JFrame {
         int studentId = (int) tblCourses.getValueAt(selectedRow, 0);
         String studentName = (String) tblCourses.getValueAt(selectedRow, 1);
         
-        // Find the student in the students collection
+        
         Student selectedStudent = null;
         for (Student s : students) {
             if (s.getStudentID() == studentId) {
@@ -158,7 +158,7 @@ public class TeacherView extends javax.swing.JFrame {
             return;
         }
         
-        // Ask if student is present
+        
         String[] options = {"Present", "Absent"};
         int choice = JOptionPane.showOptionDialog(this,
                 "Mark " + studentName + " as:",
@@ -171,12 +171,12 @@ public class TeacherView extends javax.swing.JFrame {
         
         boolean isPresent = (choice == 0); // Present = 0, Absent = 1
         
-        // Create and save attendance record
+        
         ArrayList<Attendance> attendances = FileDataStore.loadAttendance();
         Attendance attendance = new Attendance(selectedStudent, selectedSession, isPresent);
         attendance.saveAttendance(attendances);
         
-        // Update session attendees list if present
+        
         if (isPresent) {
             ArrayList<Student> attendees = selectedSession.getAttendees();
             if (!containsStudent(attendees, selectedStudent)) {
@@ -191,7 +191,7 @@ public class TeacherView extends javax.swing.JFrame {
             "Attendance Recorded", 
             JOptionPane.INFORMATION_MESSAGE);
         
-        // Refresh the attendance table
+        
         loadSessionAttendance();
     }
 
@@ -215,47 +215,47 @@ public class TeacherView extends javax.swing.JFrame {
             return;
         }
         
-        // Get the module for the selected session
+        
         Module sessionModule = selectedSession.getModule();
         
-        // Clear and set up the attendance table
+        
         DefaultTableModel model = (DefaultTableModel) tblCourses.getModel();
         model.setRowCount(0);
         
-        // Update the column headers to include attendance status
+        
         if (model.getColumnCount() < 3) {
             model.setColumnIdentifiers(new String[]{"Student ID", "Student Name", "Status"});
         }
         
-        // Find all students enrolled in this module
+        
         ArrayList<Enrollment> enrollments = FileDataStore.loadEnrollments();
         ArrayList<Student> moduleStudents = new ArrayList<>();
         
-        // Debug: Print module info to verify we're checking against the right module
+        
         System.out.println("Selected module ID: " + sessionModule.getModuleID() + ", Name: " + sessionModule.getModuleName());
         
-        // Make sure we have the latest student data
+        
         this.students = FileDataStore.loadStudents();
         
-        // First check if there are any enrollments at all
+        
         if (enrollments.isEmpty()) {
             System.out.println("No enrollments found - creating sample enrollments");
-            // If no enrollments exist, create some sample enrollments for demonstration
+            
             for (Student student : students) {
                 Enrollment enrollment = new Enrollment(student, sessionModule, Status.ACTIVE);
                 moduleStudents.add(student);
                 
-                // Save the new enrollment
+                
                 enrollments.add(enrollment);
             }
-            // Save all enrollments
+            
             FileDataStore.saveEnrollments(enrollments);
         } else {
-            // Process existing enrollments
+            
             System.out.println("Processing " + enrollments.size() + " enrollments");
             for (Enrollment e : enrollments) {
                 try {
-                    // Check module match by ID
+                    
                     if (e.getModule() != null && e.getStudent() != null && 
                         e.getModule().getModuleID() == sessionModule.getModuleID() && 
                         e.getEnrollmentStatus() == Status.ACTIVE) {
@@ -268,35 +268,35 @@ public class TeacherView extends javax.swing.JFrame {
             }
         }
         
-        // If still no students, add all students for demonstration
+        
         if (moduleStudents.isEmpty()) {
             System.out.println("No enrolled students found - adding all students for demonstration");
-            // Add all students for demo purposes
+            
             moduleStudents.addAll(students);
             
-            // Create enrollments for these students
+            
             for (Student student : students) {
                 Enrollment enrollment = new Enrollment(student, sessionModule, Status.ACTIVE);
                 enrollments.add(enrollment);
             }
-            // Save all enrollments
+            
             FileDataStore.saveEnrollments(enrollments);
         }
         
-        // Load all attendance records for this session
+        
         ArrayList<Attendance> attendanceRecords = FileDataStore.loadAttendance();
         
-        // Get the list of students who are already marked as attendees
+        
         ArrayList<Student> sessionAttendees = selectedSession.getAttendees();
         if (sessionAttendees == null) {
             sessionAttendees = new ArrayList<>();
         }
         
-        // Display each student with their attendance status
+        
         for (Student student : moduleStudents) {
             String attendanceStatus = "Not Marked";
             
-            // Check if student is already marked in attendance records
+            
             for (Attendance record : attendanceRecords) {
                 if (record.getSession().getSessionID() == selectedSession.getSessionID() && 
                     record.getStudent().getStudentID() == student.getStudentID()) {
@@ -305,7 +305,7 @@ public class TeacherView extends javax.swing.JFrame {
                 }
             }
             
-            // If not found in attendance records but in session attendees list, mark as present
+            
             if (attendanceStatus.equals("Not Marked")) {
                 for (Student attendee : sessionAttendees) {
                     if (attendee.getStudentID() == student.getStudentID()) {
@@ -315,7 +315,7 @@ public class TeacherView extends javax.swing.JFrame {
                 }
             }
             
-            // Add the student to the table
+            
             model.addRow(new Object[]{
                 student.getStudentID(),
                 student.getName(),
@@ -323,7 +323,7 @@ public class TeacherView extends javax.swing.JFrame {
             });
         }
         
-        // If the table is still empty, display a message
+        
         if (model.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this, 
                 "No students found enrolled in this module.", 
@@ -617,7 +617,7 @@ public class TeacherView extends javax.swing.JFrame {
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
         StudentLogin loginForm = new StudentLogin();
         loginForm.setVisible(true);
-        this.dispose();   // TODO add your handling code here:
+        this.dispose();
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void selectSessionBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectSessionBtnActionPerformed
@@ -629,11 +629,11 @@ public class TeacherView extends javax.swing.JFrame {
             return;
         }
         
-        // Reload sessions to make sure we have the latest data
+        
         this.sessions = FileDataStore.loadSessions();
         
         if (sessions.isEmpty()) {
-            // Reload sessions after creating sample
+            
             
             this.sessions = FileDataStore.loadSessions();
             
@@ -646,7 +646,7 @@ public class TeacherView extends javax.swing.JFrame {
             }
         }
         
-        // Filter sessions related to the teacher's modules
+        
         ArrayList<Session> teacherSessions = new ArrayList<>();
         ArrayList<Module> assignedModules = currentTeacher.getAssignedModules();
         
@@ -667,7 +667,7 @@ public class TeacherView extends javax.swing.JFrame {
             return;
         }
         
-        // Create array of session names for selection
+        
         String[] sessionNames = new String[teacherSessions.size()];
         for (int i = 0; i < teacherSessions.size(); i++) {
             Session s = teacherSessions.get(i);
@@ -675,7 +675,7 @@ public class TeacherView extends javax.swing.JFrame {
                               ", " + s.getStartTime() + " - " + s.getEndTime() + ")";
         }
         
-        // Show session selection dialog
+        
         String selectedSessionName = (String) JOptionPane.showInputDialog(this,
                 "Select session:",
                 "Session Selection",
@@ -686,8 +686,8 @@ public class TeacherView extends javax.swing.JFrame {
         
         if (selectedSessionName == null) return;
         
-        // Find the selected session
-        selectedSession = null; // Reset before looking for selection
+        
+        selectedSession = null; 
         for (int i = 0; i < teacherSessions.size(); i++) {
             if (selectedSessionName.equals(sessionNames[i])) {
                 selectedSession = teacherSessions.get(i);
@@ -696,9 +696,9 @@ public class TeacherView extends javax.swing.JFrame {
         }
         
         if (selectedSession != null) {
-            // Update label to show selected session
+            
             jLabel6.setText("Session Attendance: " + selectedSession.getSessionName());
-            // Load students for the selected session
+            
             loadSessionAttendance();
         }
     }//GEN-LAST:event_selectSessionBtnActionPerformed

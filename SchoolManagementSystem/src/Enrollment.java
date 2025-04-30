@@ -1,6 +1,8 @@
+
 import java.util.ArrayList;
 
 public class Enrollment implements IEnrollment {
+
     private static int enrollmentCounter = 0;
     private int enrollmentID;
     private Student student;
@@ -12,7 +14,7 @@ public class Enrollment implements IEnrollment {
         this.enrollmentID = enrollmentID;
     }
 
-    public Enrollment(Student student, Module module, Status enrollmentStatus){
+    public Enrollment(Student student, Module module, Status enrollmentStatus) {
         this.student = student;
         this.module = module;
         this.enrollmentStatus = enrollmentStatus;
@@ -31,9 +33,11 @@ public class Enrollment implements IEnrollment {
     public Student getStudent() {
         return student;
     }
+
     public void setGrade(float grade) {
         this.grade = grade;
     }
+
     public float getGrade() {
         return grade;
     }
@@ -46,11 +50,9 @@ public class Enrollment implements IEnrollment {
         return module;
     }
 
-
     public Status getEnrollmentStatus() {
         return enrollmentStatus;
     }
-
 
     public void generateReports(ArrayList<Enrollment> enrollments, Module module) {
         int enrolledStudents = 0;
@@ -65,21 +67,16 @@ public class Enrollment implements IEnrollment {
         System.out.println("Status: " + (enrolledStudents >= module.getMaxCapacity() ? "Full" : "Available"));
     }
 
-    
     public void addEnrollment(ArrayList<Enrollment> enrollments) {
         enrollments.add(this);
-        // Persist the data to file
         FileDataStore.saveEnrollments(enrollments);
     }
 
-    
     public void removeEnrollment(ArrayList<Enrollment> enrollments) {
         enrollments.remove(this);
-        // Persist the data to file
         FileDataStore.saveEnrollments(enrollments);
     }
 
-    
     public void updateEnrollment(ArrayList<Enrollment> enrollments) {
         for (int i = 0; i < enrollments.size(); i++) {
             if (enrollments.get(i).getEnrollmentID() == this.enrollmentID) {
@@ -87,7 +84,6 @@ public class Enrollment implements IEnrollment {
                 break;
             }
         }
-        // Persist the data to file
         FileDataStore.saveEnrollments(enrollments);
     }
 
