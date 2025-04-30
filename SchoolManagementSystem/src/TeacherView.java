@@ -36,8 +36,15 @@ public class TeacherView extends javax.swing.JFrame {
         initComponents();
         this.currentTeacher = teacher;
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        // Initialize the collections
+        this.sessions = FileDataStore.loadSessions();
+        this.students = FileDataStore.loadStudents();
+        // Display teacher information
         displayTeacherInfo();
+        // Load teacher's assigned modules
         loadAssignedModules();
+        // Initialize add attendance button action
+        initAttendanceBtn();
     }
     
     /**
@@ -89,6 +96,176 @@ public class TeacherView extends javax.swing.JFrame {
                     });
                 }
             }
+        }
+    }
+
+    /**
+     * Initialize the Add Attendance button action
+     */
+    private void initAttendanceBtn() {
+        addAttendanceBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addAttendanceBtnActionPerformed(evt);
+            }
+        });
+    }
+
+    /**
+     * Handle the Add Attendance button click
+     */
+    private void addAttendanceBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        if (selectedSession == null) {
+            JOptionPane.showMessageDialog(this, 
+                "Please select a session first.", 
+                "No Session Selected", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int selectedRow = tblCourses.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, 
+                "Please select a student first.", 
+                "No Student Selected", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int studentId = (int) tblCourses.getValueAt(selectedRow, 0);
+        String studentName = (String) tblCourses.getValueAt(selectedRow, 1);
+        
+        // Find the student in the students collection
+        Student selectedStudent = null;
+        for (Student s : students) {
+            if (s.getStudentID() == studentId) {
+                selectedStudent = s;
+                break;
+            }
+        }
+        
+        if (selectedStudent == null) {
+            JOptionPane.showMessageDialog(this, 
+                "Student not found in the system.", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Ask if student is present
+        String[] options = {"Present", "Absent"};
+        int choice = JOptionPane.showOptionDialog(this,
+                "Mark " + studentName + " as:",
+                "Attendance",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+        
+        boolean isPresent = (choice == 0); // Present = 0, Absent = 1
+        
+        // Create and save attendance record
+        ArrayList<Attendance> attendances = FileDataStore.loadAttendance();
+        Attendance attendance = new Attendance(selectedStudent, selectedSession, isPresent);
+        attendance.saveAttendance(attendances);
+        
+        // Update session attendees list if present
+        if (isPresent) {
+            ArrayList<Student> attendees = selectedSession.getAttendees();
+            if (!containsStudent(attendees, selectedStudent)) {
+                attendees.add(selectedStudent);
+                selectedSession.setAttendees(attendees);
+                selectedSession.updateSession(sessions);
+            }
+        }
+        
+        JOptionPane.showMessageDialog(this, 
+            studentName + " marked as " + (isPresent ? "present" : "absent") + ".", 
+            "Attendance Recorded", 
+            JOptionPane.INFORMATION_MESSAGE);
+        
+        // Refresh the attendance table
+        loadSessionAttendance();
+    }
+
+    /**
+     * Check if a student is in the attendees list
+     */
+    private boolean containsStudent(ArrayList<Student> students, Student student) {
+        for (Student s : students) {
+            if (s.getStudentID() == student.getStudentID()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Load the attendance data for the selected session
+     */
+    private void loadSessionAttendance() {
+        if (selectedSession == null) {
+            return;
+        }
+        
+        // Get the module for the selected session
+        Module sessionModule = selectedSession.getModule();
+        
+        // Clear and set up the attendance table
+        DefaultTableModel model = (DefaultTableModel) tblCourses.getModel();
+        model.setRowCount(0);
+        
+        // Update the column headers to include attendance status
+        if (model.getColumnCount() < 3) {
+            model.setColumnIdentifiers(new String[]{"Student ID", "Student Name", "Status"});
+        }
+        
+        // Find all students enrolled in this module
+        ArrayList<Enrollment> enrollments = FileDataStore.loadEnrollments();
+        ArrayList<Student> moduleStudents = new ArrayList<>();
+        
+        for (Enrollment e : enrollments) {
+            if (e.getModule().getModuleID() == sessionModule.getModuleID() && 
+                e.getEnrollmentStatus() == Status.ACTIVE) {
+                moduleStudents.add(e.getStudent());
+            }
+        }
+        
+        // Load all attendance records for this session
+        ArrayList<Attendance> attendanceRecords = FileDataStore.loadAttendance();
+        
+        // Get the list of students who are already marked as attendees
+        ArrayList<Student> sessionAttendees = selectedSession.getAttendees();
+        
+        // Display each student with their attendance status
+        for (Student student : moduleStudents) {
+            String attendanceStatus = "Not Marked";
+            
+            // Check if student is already marked in attendance records
+            for (Attendance record : attendanceRecords) {
+                if (record.getSession().getSessionID() == selectedSession.getSessionID() && 
+                    record.getStudent().getStudentID() == student.getStudentID()) {
+                    attendanceStatus = record.isPresent() ? "Present" : "Absent";
+                    break;
+                }
+            }
+            
+            // If not found in attendance records but in session attendees list, mark as present
+            if (attendanceStatus.equals("Not Marked")) {
+                for (Student attendee : sessionAttendees) {
+                    if (attendee.getStudentID() == student.getStudentID()) {
+                        attendanceStatus = "Present";
+                        break;
+                    }
+                }
+            }
+            
+            // Add the student to the table
+            model.addRow(new Object[]{
+                student.getStudentID(),
+                student.getName(),
+                attendanceStatus
+            });
         }
     }
 
@@ -379,7 +556,68 @@ public class TeacherView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void selectSessionBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectSessionBtnActionPerformed
-        // TODO add your handling code here:
+    if (currentTeacher == null || sessions == null || sessions.isEmpty()) {
+        JOptionPane.showMessageDialog(this, 
+            "No sessions available.", 
+            "No Sessions", 
+            JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Filter sessions related to the teacher's modules
+    ArrayList<Session> teacherSessions = new ArrayList<>();
+    ArrayList<Module> assignedModules = currentTeacher.getAssignedModules();
+    
+    for (Session session : sessions) {
+        for (Module module : assignedModules) {
+            if (session.getModule().getModuleID() == module.getModuleID()) {
+                teacherSessions.add(session);
+                break;
+            }
+        }
+    }
+    
+    if (teacherSessions.isEmpty()) {
+        JOptionPane.showMessageDialog(this, 
+            "You don't have any sessions scheduled for your modules.", 
+            "No Sessions", 
+            JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Create array of session names for selection
+    String[] sessionNames = new String[teacherSessions.size()];
+    for (int i = 0; i < teacherSessions.size(); i++) {
+        Session s = teacherSessions.get(i);
+        sessionNames[i] = s.getSessionName() + " (" + s.getModule().getModuleName() + 
+                          ", " + s.getStartTime() + " - " + s.getEndTime() + ")";
+    }
+    
+    // Show session selection dialog
+    String selectedSessionName = (String) JOptionPane.showInputDialog(this,
+            "Select session:",
+            "Session Selection",
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            sessionNames,
+            sessionNames.length > 0 ? sessionNames[0] : null);
+    
+    if (selectedSessionName == null) return;
+    
+    // Find the selected session
+    for (int i = 0; i < teacherSessions.size(); i++) {
+        if (selectedSessionName.equals(sessionNames[i])) {
+            selectedSession = teacherSessions.get(i);
+            break;
+        }
+    }
+    
+    if (selectedSession != null) {
+        // Update label to show selected session
+        jLabel6.setText("Session Attendance: " + selectedSession.getSessionName());
+        // Load students for the selected session
+        loadSessionAttendance();
+    }
     }//GEN-LAST:event_selectSessionBtnActionPerformed
 
     /**
