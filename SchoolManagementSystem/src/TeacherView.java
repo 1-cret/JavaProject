@@ -1,5 +1,6 @@
-
 import javax.swing.JFrame;
+import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -11,6 +12,7 @@ import javax.swing.JFrame;
  * @author Omayr
  */
 public class TeacherView extends javax.swing.JFrame {
+    private Teacher currentTeacher;
 
     /**
      * Creates new form TeacherView
@@ -18,6 +20,70 @@ public class TeacherView extends javax.swing.JFrame {
     public TeacherView() {
         initComponents();
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+    }
+    
+    /**
+     * Creates new form TeacherView with specified teacher data
+     * @param teacher The teacher whose data will be displayed
+     */
+    public TeacherView(Teacher teacher) {
+        initComponents();
+        this.currentTeacher = teacher;
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        displayTeacherInfo();
+        loadAssignedModules();
+    }
+    
+    /**
+     * Display the teacher's information in the appropriate labels
+     */
+    private void displayTeacherInfo() {
+        if (currentTeacher != null) {
+            lblStudentID.setText(String.valueOf(currentTeacher.getStaffId()));
+            lblName.setText(currentTeacher.getName());
+            lblEmail.setText(currentTeacher.getEmail());
+            lblWelcome.setText("Welcome, " + currentTeacher.getName());
+        }
+    }
+    
+    /**
+     * Load the teacher's assigned modules and display them in the table
+     */
+    private void loadAssignedModules() {
+        if (currentTeacher != null) {
+            DefaultTableModel model = (DefaultTableModel) tblCourses.getModel();
+            // Clear existing rows
+            model.setRowCount(0);
+            
+            // Load modules from the teacher
+            ArrayList<Module> assignedModules = currentTeacher.getAssignedModules();
+            
+            // If the teacher doesn't have any modules assigned yet, try to load modules from the system
+            if (assignedModules.isEmpty()) {
+                // This is a placeholder for module assignment logic
+                // In a real system, you might want to query for modules assigned to this teacher
+                ArrayList<Module> allModules = FileDataStore.loadModules();
+                
+                // For demonstration, we'll assign some modules to the teacher if they exist
+                for (Module module : allModules) {
+                    // Add rows to the table
+                    model.addRow(new Object[]{
+                        module.getModuleID(),
+                        module.getModuleName(),
+                        module.getMaxCapacity()
+                    });
+                }
+            } else {
+                // Add assigned modules to the table
+                for (Module module : assignedModules) {
+                    model.addRow(new Object[]{
+                        module.getModuleID(),
+                        module.getModuleName(),
+                        module.getMaxCapacity()
+                    });
+                }
+            }
+        }
     }
 
     /**

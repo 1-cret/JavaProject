@@ -240,7 +240,7 @@ public class StudentLogin extends javax.swing.JFrame {
                 javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
             } else {
                 if (t.getRole().equals("teacher")) {
-                    TeacherView teacher = new TeacherView();
+                    TeacherView teacher = new TeacherView(t);
                     teacher.setVisible(true);
                     this.dispose();
                 }
