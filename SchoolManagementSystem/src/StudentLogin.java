@@ -238,22 +238,27 @@ public class StudentLogin extends javax.swing.JFrame {
             Teacher t = teacherLogin(email, password);
             if (t == null) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
+            } else {
+                if (t.getRole().equals("teacher")) {
+                    TeacherView teacher = new TeacherView();
+                    teacher.setVisible(true);
+                    this.dispose();
+                }
             }
+
         } else if (role.equals("Admin")) {
             Admin a = adminLogin(email, password);
             if (a == null) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
-            }
-            else{
-                if(a.getRole().equals("admin")){
+            } else {
+                if (a.getRole().equals("admin")) {
                     AdminView admin = new AdminView();
                     admin.setVisible(true);
-                    this.dispose(); 
-                }
-               else{
-                javax.swing.JOptionPane.showMessageDialog(this, "Invalid Data");
+                    this.dispose();
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Invalid Data");
 
-               }
+                }
             }
         } else {
             javax.swing.JOptionPane.showMessageDialog(this, "Please select a role");
