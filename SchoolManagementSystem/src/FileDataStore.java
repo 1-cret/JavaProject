@@ -317,8 +317,12 @@ public class FileDataStore {
     }
 
     // Session operations
-    public static ArrayList<Session> loadSessions(ArrayList<Module> modules, ArrayList<Classroom> classrooms) {
+    public static ArrayList<Session> loadSessions() {
         ArrayList<Session> sessions = new ArrayList<>();
+        ArrayList<Module> modules = loadModules();
+        ArrayList<Classroom> classrooms = loadClassrooms();
+        ArrayList<Student> students = loadStudents();
+        
         try {
             File file = new File(SESSIONS_FILE);
             if (!file.exists()) {
@@ -359,7 +363,27 @@ public class FileDataStore {
                     }
                     
                     if (module != null && classroom != null) {
-                        Session session = new Session(module, sessionName, startTime, endTime, classroom, new ArrayList<>(), status);
+                        // Load attendees if available
+                        ArrayList<Student> attendees = new ArrayList<>();
+                        if (data.length > 7 && !data[7].isEmpty()) {
+                            String[] attendeeIds = data[7].split(":");
+                            for (String idStr : attendeeIds) {
+                                try {
+                                    int studentId = Integer.parseInt(idStr);
+                                    // Find the student in the loaded students
+                                    for (Student s : students) {
+                                        if (s.getStudentID() == studentId) {
+                                            attendees.add(s);
+                                            break;
+                                        }
+                                    }
+                                } catch (NumberFormatException e) {
+                                    System.err.println("Invalid student ID format: " + idStr);
+                                }
+                            }
+                        }
+                        
+                        Session session = new Session(module, sessionName, startTime, endTime, classroom, attendees, status);
                         sessions.add(session);
                     }
                 }
@@ -373,19 +397,37 @@ public class FileDataStore {
         return sessions;
     }
 
+    // Use the existing loadSessions method for backward compatibility
+    public static ArrayList<Session> loadSessions(ArrayList<Module> modules, ArrayList<Classroom> classrooms) {
+        return loadSessions();
+    }
+
     public static void saveSessions(ArrayList<Session> sessions) {
         try {
             DataOutputStream output = new DataOutputStream(new FileOutputStream(SESSIONS_FILE));
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
             
             for (Session session : sessions) {
+                // Build the attendees string with student IDs
+                StringBuilder attendeeBuilder = new StringBuilder();
+                ArrayList<Student> attendees = session.getAttendees();
+                if (attendees != null && !attendees.isEmpty()) {
+                    for (int i = 0; i < attendees.size(); i++) {
+                        if (i > 0) {
+                            attendeeBuilder.append(":");
+                        }
+                        attendeeBuilder.append(attendees.get(i).getStudentID());
+                    }
+                }
+                
                 String line = session.getSessionID() + "," + 
                               session.getModule().getModuleID() + "," + 
                               session.getSessionName() + "," + 
                               session.getStartTime() + "," + 
                               session.getEndTime() + "," + 
                               session.getClassroom().getClassroomId() + "," + 
-                              session.getStatus();
+                              session.getStatus() + "," +
+                              attendeeBuilder.toString();
                 writer.write(line);
                 writer.newLine();
             }
@@ -452,6 +494,17 @@ public class FileDataStore {
             System.err.println("Error loading enrollments: " + e.getMessage());
         }
         return enrollments;
+    }
+
+    /**
+     * Load enrollments without requiring parameters.
+     * This method will load all students and modules first, then load enrollments.
+     * @return ArrayList of Enrollment objects
+     */
+    public static ArrayList<Enrollment> loadEnrollments() {
+        ArrayList<Student> students = loadStudents();
+        ArrayList<Module> modules = loadModules();
+        return loadEnrollments(students, modules);
     }
 
     public static void saveEnrollments(ArrayList<Enrollment> enrollments) {
