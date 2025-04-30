@@ -23,8 +23,10 @@ public class Classroom {
     public int getClassroomId() {
         return classroomId;
     }
+    public void setClassroomId(int classroomId) {
+        this.classroomId = classroomId;
+    }
     
-    // Added for backwards compatibility with existing code
     public int getClassroomID() {
         return classroomId;
     }

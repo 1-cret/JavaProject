@@ -111,6 +111,7 @@
                  handleDeleteAction(selectedLabel.getText());
              }
          });
+        
      }
      
      /**
@@ -287,6 +288,7 @@
          jButton1 = new javax.swing.JButton();
          jButton2 = new javax.swing.JButton();
          jButton3 = new javax.swing.JButton();
+         jButton4 = new javax.swing.JButton();
  
          setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
  
@@ -467,6 +469,14 @@
                  jButton3ActionPerformed(evt);
              }
          });
+         
+         jButton4.setBackground(new java.awt.Color(51, 153, 255));
+         jButton4.setText("Assign Module");
+         jButton4.addActionListener(new java.awt.event.ActionListener() {
+             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                 assignModuleToTeacherActionPerformed(evt);
+             }
+         });
  
          javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
          jPanel4.setLayout(jPanel4Layout);
@@ -479,6 +489,8 @@
                  .addComponent(jButton2)
                  .addGap(18, 18, 18)
                  .addComponent(jButton3)
+                 .addGap(18, 18, 18)
+                 .addComponent(jButton4)
                  .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
          );
          jPanel4Layout.setVerticalGroup(
@@ -486,10 +498,12 @@
              .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                  .addContainerGap(17, Short.MAX_VALUE)
                  .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                     .addComponent(jButton1)
-                     .addComponent(jButton2)
-                     .addComponent(jButton3))
-                 .addContainerGap())
+                 .addComponent(jButton1)
+                 .addComponent(jButton2)
+                 .addComponent(jButton3)
+                 .addComponent(jButton4))
+             .addContainerGap()
+             )
          );
  
          javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -591,6 +605,16 @@
          
          // Update button labels based on selected item
          updateButtonLabels(label.getText());
+
+         // Modify the visibility of the "Assign Module" button to only show in the Admin tab
+         if (selectedLabel.getText().equals("Teachers")) {
+             jButton4.setVisible(true);
+         } else {
+             jButton4.setVisible(false);
+         }
+         
+         // Ensure this logic is applied when the main panel is updated
+         updateMainPanel(selectedLabel.getText());
      }
  
      private void updateButtonLabels(String category) {
@@ -657,44 +681,49 @@
                  // Load student data from the collection
                  if (students != null) {
                      for (Student student : students) {
-                         model.addRow(new Object[]{
-                             student.getStudentID(),
-                             student.getName(),
-                             student.getEmail(),
-                             student.getYear(),
-                             student.getAnnualFee()
-                         });
+                        model.addRow(new Object[]{
+                            student.getStudentID(),
+                            student.getName(),
+                            student.getEmail(),
+                            student.getYear(),
+                            student.getAnnualFee()
+                        });
                      }
                  }
+                 
                  break;
              case "Teachers":
                  model.setColumnIdentifiers(new String[]{"Teacher ID", "Name", "Email", "Status", "Password"});
                  // Load teacher data
                  if (teachers != null) {
                      for (Teacher teacher : teachers) {
-                         model.addRow(new Object[]{
-                             teacher.getStaffId(),
-                             teacher.getName(),
-                             teacher.getEmail(),
-                             teacher.getStatus(),
-                             teacher.getPassword()
-                         });
+                        model.addRow(new Object[]{
+                            teacher.getStaffId(),
+                            teacher.getName(),
+                            teacher.getEmail(),
+                            teacher.getStatus(),
+                            teacher.getPassword()
+                        });
                      }
                  }
+                 
+             
                  break;
              case "Modules":
                  model.setColumnIdentifiers(new String[]{"Module ID", "Module Name", "Capacity", "Year"});
                  // Load module data
                  if (modules != null) {
                      for (Module module : modules) {
-                         model.addRow(new Object[]{
-                             module.getModuleID(),
-                             module.getModuleName(),
-                             module.getMaxCapacity(),
-                             module.getModuleYear()
-                         });
+                        model.addRow(new Object[]{
+                            module.getModuleID(),
+                            module.getModuleName(),
+                            module.getMaxCapacity(),
+                            module.getModuleYear()
+                        });
                      }
                  }
+                 
+               
                  break;
              case "Assessments":
                  model.setColumnIdentifiers(new String[]{"Assessment ID", "Module", "Title", "Duration", "Date"});
@@ -800,6 +829,8 @@
          
          // Refresh UI
          jPanel3.repaint();
+         jPanel4.revalidate();
+         jPanel4.repaint();
      }
  
      @Override
@@ -3135,7 +3166,96 @@
                      JOptionPane.ERROR_MESSAGE);
          }
      }
- 
+
+     private void assignModuleToTeacherActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            // Get the selected teacher from the table
+            int selectedRow = tblCourses.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, 
+                        "Please select a teacher to assign a module", 
+                        "No Selection", 
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int teacherId = (int) tblCourses.getValueAt(selectedRow, 0);
+            Teacher selectedTeacher = null;
+            for (Teacher teacher : teachers) {
+                if (teacher.getStaffId() == teacherId) {
+                    selectedTeacher = teacher;
+                    break;
+                }
+            }
+
+            if (selectedTeacher == null) {
+                JOptionPane.showMessageDialog(this, 
+                        "Teacher not found.", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Check if there are any modules available
+            if (modules == null || modules.isEmpty()) {
+                JOptionPane.showMessageDialog(this, 
+                        "No modules available. Please add modules first.", 
+                        "No Modules", 
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Show a dialog to select a module
+            String[] moduleNames = modules.stream().map(Module::getModuleName).toArray(String[]::new);
+            String selectedModuleName = (String) JOptionPane.showInputDialog(this, 
+                    "Select a module to assign:", 
+                    "Assign Module", 
+                    JOptionPane.QUESTION_MESSAGE, 
+                    null, 
+                    moduleNames, 
+                    moduleNames.length > 0 ? moduleNames[0] : null);
+
+            if (selectedModuleName == null) return;
+
+            Module selectedModule = null;
+            for (Module module : modules) {
+                if (module.getModuleName().equals(selectedModuleName)) {
+                    selectedModule = module;
+                    break;
+                }
+            }
+
+            if (selectedModule == null) {
+                JOptionPane.showMessageDialog(this, 
+                        "Module not found.", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Assign the module to the teacher
+            selectedTeacher.assignModule(selectedModule);
+
+            // Save the updated teacher data
+            FileDataStore.saveTeachers(teachers);
+
+            JOptionPane.showMessageDialog(this, 
+                    "Module assigned successfully!", 
+                    "Success", 
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            // Refresh the table
+            updateMainPanel("Teachers");
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                    "Error assigning module: " + e.getMessage(), 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
      /**
       * @param args the command line arguments
       */
@@ -3176,6 +3296,7 @@
      private javax.swing.JButton jButton1;
      private javax.swing.JButton jButton2;
      private javax.swing.JButton jButton3;
+     private javax.swing.JButton jButton4;
      private javax.swing.JLabel jLabel1;
      private javax.swing.JLabel jLabel2;
      private javax.swing.JLabel jLabel3;
@@ -3195,4 +3316,3 @@
      private javax.swing.JTable tblCourses;
      // End of variables declaration//GEN-END:variables
  }
- 

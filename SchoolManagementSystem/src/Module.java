@@ -11,6 +11,9 @@ public class Module {
     public Module(int moduleID) {
         this.moduleID = moduleID;
     }
+    public void setModuleID(int moduleID) {
+        this.moduleID = moduleID;
+    }
 
     
     public Module(String moduleName, int maxCapacity, ArrayList<Assessment> assessment, int moduleYear) {

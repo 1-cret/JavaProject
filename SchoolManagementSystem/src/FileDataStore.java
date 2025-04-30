@@ -159,6 +159,7 @@ public class FileDataStore {
             
             String line;
             while ((line = reader.readLine()) != null) {
+                System.out.println("Loading module data: " + line);
                 String[] data = line.split(",");
                 if (data.length >= 4) {
                     int moduleID = Integer.parseInt(data[0]);
@@ -170,6 +171,7 @@ public class FileDataStore {
                     ArrayList<Assessment> assessments = new ArrayList<>();
                     
                     Module module = new Module(moduleName, maxCapacity, assessments, moduleYear);
+                    module.setModuleID(moduleID);
                     modules.add(module);
                 }
             }
@@ -226,6 +228,7 @@ public class FileDataStore {
                     
                     Classroom classroom = new Classroom(roomName, capacity);
                     classrooms.add(classroom);
+                    classroom.setClassroomId(classroomId);
                 }
             }
             reader.close();
@@ -334,9 +337,12 @@ public class FileDataStore {
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
             
             String line;
+            System.out.println("Loading sessions...");
             while ((line = reader.readLine()) != null) {
+                System.out.println("Loading session data: " + line);
                 String[] data = line.split(",");
                 if (data.length >= 7) {
+                    System.out.println("Data length: " + data.length);
                     int sessionID = Integer.parseInt(data[0]);
                     int moduleID = Integer.parseInt(data[1]);
                     String sessionName = data[2];
@@ -350,6 +356,7 @@ public class FileDataStore {
                     Classroom classroom = null;
                     
                     for (Module m : modules) {
+                      
                         if (m.getModuleID() == moduleID) {
                             module = m;
                             break;
@@ -357,16 +364,20 @@ public class FileDataStore {
                     }
                     
                     for (Classroom c : classrooms) {
+
                         if (c.getClassroomId() == classroomID) {
                             classroom = c;
                             break;
                         }
                     }
+                    System.out.println("Module: " + module + ", Classroom: " + classroom);
                     
                     if (module != null && classroom != null) {
+                        System.out.println("Module and classroom found.");
                         // Load attendees if available
                         ArrayList<Student> attendees = new ArrayList<>();
                         if (data.length > 7 && !data[7].isEmpty()) {
+                            System.out.println("Loading attendees...");
                             String[] attendeeIds = data[7].split(":");
                             for (String idStr : attendeeIds) {
                                 try {
@@ -385,6 +396,7 @@ public class FileDataStore {
                         }
                         
                         Session session = new Session(module, sessionName, startTime, endTime, classroom, attendees, status);
+                        System.out.println("Loading session data: " + session);
                         sessions.add(session);
                     }
                 }
