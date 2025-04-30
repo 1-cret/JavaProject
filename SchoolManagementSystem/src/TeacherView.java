@@ -1,9 +1,8 @@
 import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.JOptionPane;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import javax.swing.JOptionPane;
+import javax.swing.DefaultComboBoxModel;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -16,10 +15,10 @@ import java.util.Map;
  */
 public class TeacherView extends javax.swing.JFrame {
     private Teacher currentTeacher;
-    private ArrayList<Session> teacherSessions;
+    private ArrayList<Session> sessions;
+    private ArrayList<Student> students;
+    private Module selectedModule;
     private Session selectedSession;
-    private ArrayList<Student> allStudents;
-    private Map<Integer, Boolean> attendanceMap; // Maps student ID to attendance status
 
     /**
      * Creates new form TeacherView
@@ -37,14 +36,26 @@ public class TeacherView extends javax.swing.JFrame {
         initComponents();
         this.currentTeacher = teacher;
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.sessions = FileDataStore.loadSessions();
+        this.students = FileDataStore.loadStudents();
         displayTeacherInfo();
         loadAssignedModules();
         
-        // Initialize attendance tracking
-        this.teacherSessions = new ArrayList<>();
-        this.attendanceMap = new HashMap<>();
-        this.allStudents = FileDataStore.loadStudents();
-        loadTeacherSessions();
+        // Set up table selection listener for courses
+        tblCourses.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tblCourses.getSelectedRow() != -1) {
+                int moduleId = (int) tblCourses.getValueAt(tblCourses.getSelectedRow(), 0);
+                loadModuleSessions(moduleId);
+            }
+        });
+        
+        // Set up table selection listener for sessions
+        tblSessions.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tblSessions.getSelectedRow() != -1) {
+                int sessionId = (int) tblSessions.getValueAt(tblSessions.getSelectedRow(), 0);
+                loadSessionAttendance(sessionId);
+            }
+        });
     }
     
     /**
@@ -100,189 +111,180 @@ public class TeacherView extends javax.swing.JFrame {
     }
 
     /**
-     * Load all sessions for modules assigned to this teacher
+     * Load sessions for a selected module
+     * @param moduleId The ID of the selected module
      */
-    private void loadTeacherSessions() {
-        if (currentTeacher == null) return;
-        
-        // Get all sessions from file storage
-        ArrayList<Session> allSessions = FileDataStore.loadSessions();
-        teacherSessions.clear();
-        
-        // Get all modules assigned to the teacher
-        ArrayList<Module> assignedModules = currentTeacher.getAssignedModules();
-        
-        // Filter sessions that belong to the teacher's modules
-        for (Session session : allSessions) {
-            Module sessionModule = session.getModule();
-            if (sessionModule != null) {
-                for (Module teacherModule : assignedModules) {
-                    if (teacherModule.getModuleID() == sessionModule.getModuleID()) {
-                        teacherSessions.add(session);
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // Update the sessions table
-        updateSessionsTable();
-    }
-    
-    /**
-     * Update the sessions table with current session data
-     */
-    private void updateSessionsTable() {
-        DefaultTableModel model = (DefaultTableModel) tblSessions.getModel();
-        model.setRowCount(0); // Clear existing rows
-        
-        for (Session session : teacherSessions) {
-            model.addRow(new Object[]{
-                session.getSessionID(),
-                session.getSessionName(),
-                session.getModule().getModuleName(),
-                session.getStartTime(),
-                session.getEndTime(),
-                session.getClassroom() != null ? session.getClassroom().getRoomName() : "TBA"
-            });
-        }
-    }
-    
-    /**
-     * Load students for attendance for a selected session
-     */
-    private void loadStudentsForAttendance() {
-        if (selectedSession == null) return;
-        
-        DefaultTableModel model = (DefaultTableModel) tblAttendance.getModel();
-        model.setRowCount(0); // Clear existing rows
-        
-        // Initialize attendance map for this session
-        attendanceMap.clear();
-        
-        // Get current attendees for this session
-        ArrayList<Student> currentAttendees = selectedSession.getAttendees();
-        
-        // Get all enrollments to find students who should be in this session
-        ArrayList<Enrollment> enrollments = FileDataStore.loadEnrollments();
-        ArrayList<Student> enrolledStudents = new ArrayList<>();
-        
-        // Find all students enrolled in this module
-        for (Enrollment enrollment : enrollments) {
-            if (enrollment.getModule().getModuleID() == selectedSession.getModule().getModuleID()) {
-                enrolledStudents.add(enrollment.getStudent());
-            }
-        }
-        
-        // Add enrolled students to the table
-        for (Student student : enrolledStudents) {
-            boolean isPresent = false;
-            
-            // Check if student is already marked as present in this session
-            for (Student attendee : currentAttendees) {
-                if (attendee.getStudentID() == student.getStudentID()) {
-                    isPresent = true;
-                    break;
-                }
-            }
-            
-            // Add to attendance map
-            attendanceMap.put(student.getStudentID(), isPresent);
-            
-            // Add to table
-            model.addRow(new Object[]{
-                student.getStudentID(),
-                student.getName(),
-                student.getEmail(),
-                isPresent
-            });
-        }
-    }
-    
-    /**
-     * Save attendance records for the selected session
-     */
-    private void saveAttendance() {
-        if (selectedSession == null) return;
-        
-        ArrayList<Student> updatedAttendees = new ArrayList<>();
-        
-        // For each student in the attendance map
-        for (Map.Entry<Integer, Boolean> entry : attendanceMap.entrySet()) {
-            int studentId = entry.getKey();
-            boolean isPresent = entry.getValue();
-            
-            if (isPresent) {
-                // Find the student in allStudents and add to attendees
-                for (Student student : allStudents) {
-                    if (student.getStudentID() == studentId) {
-                        updatedAttendees.add(student);
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // Update the session with new attendees
-        selectedSession.setAttendees(updatedAttendees);
-        
-        // Update session in the list
-        ArrayList<Session> allSessions = FileDataStore.loadSessions();
-        for (int i = 0; i < allSessions.size(); i++) {
-            if (allSessions.get(i).getSessionID() == selectedSession.getSessionID()) {
-                allSessions.set(i, selectedSession);
+    private void loadModuleSessions(int moduleId) {
+        // Find the selected module
+        ArrayList<Module> modules = FileDataStore.loadModules();
+        for (Module module : modules) {
+            if (module.getModuleID() == moduleId) {
+                selectedModule = module;
                 break;
             }
         }
         
-        // Save back to file
-        FileDataStore.saveSessions(allSessions);
+        if (selectedModule == null) {
+            return;
+        }
         
-        // Refresh the teacher sessions
-        loadTeacherSessions();
+        // Load sessions for this module
+        DefaultTableModel model = (DefaultTableModel) tblSessions.getModel();
+        model.setRowCount(0);
         
-        JOptionPane.showMessageDialog(this, 
-            "Attendance saved successfully for " + selectedSession.getSessionName(), 
-            "Success", 
-            JOptionPane.INFORMATION_MESSAGE);
+        for (Session session : sessions) {
+            if (session.getModule() != null && session.getModule().getModuleID() == moduleId) {
+                model.addRow(new Object[]{
+                    session.getSessionID(),
+                    session.getSessionName(),
+                    session.getStartTime(),
+                    session.getEndTime(),
+                    session.getStatus()
+                });
+            }
+        }
     }
     
     /**
-     * Handle the selection change in the sessions table
+     * Load attendance records for a selected session
+     * @param sessionId The ID of the selected session
      */
-    private void sessionTableSelectionChanged() {
-        int selectedRow = tblSessions.getSelectedRow();
-        if (selectedRow >= 0) {
-            int sessionId = (int) tblSessions.getValueAt(selectedRow, 0);
+    private void loadSessionAttendance(int sessionId) {
+        // Find the selected session
+        for (Session session : sessions) {
+            if (session.getSessionID() == sessionId) {
+                selectedSession = session;
+                break;
+            }
+        }
+        
+        if (selectedSession == null) {
+            return;
+        }
+        
+        // Load attendance for this session
+        DefaultTableModel model = (DefaultTableModel) tblAttendance.getModel();
+        model.setRowCount(0);
+        
+        ArrayList<Student> attendees = selectedSession.getAttendees();
+        if (attendees != null && !attendees.isEmpty()) {
+            for (Student student : attendees) {
+                model.addRow(new Object[]{
+                    student.getStudentID(),
+                    student.getName(),
+                    student.getEmail(),
+                    "Present"
+                });
+            }
+        }
+    }
+    
+    /**
+     * Record attendance for a student in the selected session
+     */
+    private void recordAttendance() {
+        if (selectedSession == null) {
+            JOptionPane.showMessageDialog(this, "Please select a session first.",
+                    "No Session Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Show a dialog to select a student
+        ArrayList<Student> moduleStudents = getStudentsForModule(selectedModule);
+        if (moduleStudents.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No students enrolled in this module.",
+                    "No Students", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Create a list of student names for display in the dialog
+        String[] studentNames = new String[moduleStudents.size()];
+        for (int i = 0; i < moduleStudents.size(); i++) {
+            Student student = moduleStudents.get(i);
+            studentNames[i] = student.getName() + " (ID: " + student.getStudentID() + ")";
+        }
+        
+        // Show the student selection dialog
+        String selectedStudentName = (String) JOptionPane.showInputDialog(this,
+                "Select a student to record attendance:", "Record Attendance",
+                JOptionPane.QUESTION_MESSAGE, null, studentNames, studentNames[0]);
+        
+        if (selectedStudentName == null) {
+            return; // User canceled
+        }
+        
+        // Extract the student ID from the selection
+        int selectedStudentId = Integer.parseInt(selectedStudentName.substring(
+                selectedStudentName.lastIndexOf("ID: ") + 4, selectedStudentName.lastIndexOf(")")));
+        
+        // Find the selected student
+        Student selectedStudent = null;
+        for (Student student : moduleStudents) {
+            if (student.getStudentID() == selectedStudentId) {
+                selectedStudent = student;
+                break;
+            }
+        }
+        
+        if (selectedStudent == null) {
+            return;
+        }
+        
+        // Check if the student is already in the attendance list
+        ArrayList<Student> attendees = selectedSession.getAttendees();
+        boolean alreadyPresent = false;
+        
+        for (Student attendee : attendees) {
+            if (attendee.getStudentID() == selectedStudent.getStudentID()) {
+                alreadyPresent = true;
+                break;
+            }
+        }
+        
+        if (alreadyPresent) {
+            JOptionPane.showMessageDialog(this, "This student is already marked as present.",
+                    "Already Present", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            // Add the student to the attendance list
+            attendees.add(selectedStudent);
+            selectedSession.setAttendees(attendees);
             
-            // Find the session in teacherSessions
-            for (Session session : teacherSessions) {
-                if (session.getSessionID() == sessionId) {
-                    selectedSession = session;
+            // Update the session in the list
+            for (int i = 0; i < sessions.size(); i++) {
+                if (sessions.get(i).getSessionID() == selectedSession.getSessionID()) {
+                    sessions.set(i, selectedSession);
                     break;
                 }
             }
             
-            // Load students for this session
-            loadStudentsForAttendance();
+            // Save the updated sessions
+            FileDataStore.saveSessions(sessions);
+            
+            // Refresh the attendance table
+            loadSessionAttendance(selectedSession.getSessionID());
+            
+            JOptionPane.showMessageDialog(this, "Attendance recorded successfully.",
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     
     /**
-     * Toggle attendance status for a student
-     * @param studentId The ID of the student
+     * Get students enrolled in a specific module
+     * @param module The module to get students for
+     * @return List of students enrolled in the module
      */
-    private void toggleAttendance(int studentId) {
-        if (attendanceMap.containsKey(studentId)) {
-            // Toggle the attendance status
-            boolean currentStatus = attendanceMap.get(studentId);
-            attendanceMap.put(studentId, !currentStatus);
-            
-            // Refresh the attendance table
-            loadStudentsForAttendance();
+    private ArrayList<Student> getStudentsForModule(Module module) {
+        ArrayList<Student> moduleStudents = new ArrayList<>();
+        ArrayList<Enrollment> enrollments = FileDataStore.loadEnrollments();
+        
+        for (Enrollment enrollment : enrollments) {
+            if (enrollment.getModule().getModuleID() == module.getModuleID()) {
+                moduleStudents.add(enrollment.getStudent());
+            }
         }
+        
+        return moduleStudents;
     }
-    // jh
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -311,10 +313,11 @@ public class TeacherView extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tblSessions = new javax.swing.JTable();
         jLabel7 = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblAttendance = new javax.swing.JTable();
-        btnSaveAttendance = new javax.swing.JButton();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jLabel8 = new javax.swing.JLabel();
+        btnRecordAttendance = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -462,75 +465,28 @@ public class TeacherView extends javax.swing.JFrame {
         );
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Sessions and Attendance", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Module Sessions", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
 
         tblSessions.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Session ID", "Session Name", "Module", "Start Time", "End Time", "Classroom"
+                "Session ID", "Session Name", "Start Time", "End Time", "Status"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
-            }
-        });
-        tblSessions.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                sessionTableSelectionChanged();
             }
         });
         jScrollPane2.setViewportView(tblSessions);
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel7.setText("Sessions:");
-
-        tblAttendance.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Student ID", "Name", "Email", "Present"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, true
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        tblAttendance.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int row = tblAttendance.rowAtPoint(evt.getPoint());
-                int col = tblAttendance.columnAtPoint(evt.getPoint());
-                if (col == 3) {
-                    int studentId = (int) tblAttendance.getValueAt(row, 0);
-                    toggleAttendance(studentId);
-                }
-            }
-        });
-        jScrollPane3.setViewportView(tblAttendance);
-
-        btnSaveAttendance.setText("Save Attendance");
-        btnSaveAttendance.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveAttendance();
-            }
-        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -542,11 +498,7 @@ public class TeacherView extends javax.swing.JFrame {
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel7)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnSaveAttendance)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -556,15 +508,69 @@ public class TeacherView extends javax.swing.JFrame {
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSaveAttendance)
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Courses", jPanel3);
-        jTabbedPane1.addTab("Sessions", jPanel4);
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Session Attendance", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
+
+        tblAttendance.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Student ID", "Student Name", "Email", "Status"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(tblAttendance);
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel8.setText("Attendance:");
+
+        btnRecordAttendance.setBackground(new java.awt.Color(153, 204, 255));
+        btnRecordAttendance.setFont(new java.awt.Font("Segoe UI", 1, 12));
+        btnRecordAttendance.setText("Record Attendance");
+        btnRecordAttendance.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRecordAttendanceActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnRecordAttendance)))
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRecordAttendance)
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -575,7 +581,11 @@ public class TeacherView extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -584,8 +594,10 @@ public class TeacherView extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTabbedPane1)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         pack();
@@ -596,6 +608,10 @@ public class TeacherView extends javax.swing.JFrame {
         loginForm.setVisible(true);
         this.dispose();   // TODO add your handling code here:
     }//GEN-LAST:event_btnLogoutActionPerformed
+
+    private void btnRecordAttendanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRecordAttendanceActionPerformed
+        recordAttendance();
+    }//GEN-LAST:event_btnRecordAttendanceActionPerformed
 
     /**
      * @param args the command line arguments
@@ -634,20 +650,21 @@ public class TeacherView extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnSaveAttendance;
+    private javax.swing.JButton btnRecordAttendance;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblEmail;
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblStudentID;

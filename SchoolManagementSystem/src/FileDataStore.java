@@ -11,6 +11,7 @@ public class FileDataStore {
     private static final String PAYMENTS_FILE = DATA_DIRECTORY + "payments.txt";
     private static final String TEACHERS_FILE = DATA_DIRECTORY + "teachers.txt";
     private static final String ADMINS_FILE = DATA_DIRECTORY + "admins.txt";
+    private static final String ATTENDANCE_FILE = DATA_DIRECTORY + "attendance.txt";
 
     // Initialize the data directory if it doesn't exist
     static {
@@ -596,6 +597,88 @@ public class FileDataStore {
             
         } catch (IOException e) {
             System.err.println("Error saving payments: " + e.getMessage());
+        }
+    }
+
+    // Attendance operations
+    public static ArrayList<Attendance> loadAttendance() {
+        ArrayList<Attendance> attendanceList = new ArrayList<>();
+        ArrayList<Student> students = loadStudents();
+        ArrayList<Session> sessions = loadSessions();
+        
+        try {
+            File file = new File(ATTENDANCE_FILE);
+            if (!file.exists()) {
+                return attendanceList;
+            }
+
+            DataInputStream input = new DataInputStream(new FileInputStream(file));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length >= 5) {
+                    int attendanceId = Integer.parseInt(data[0]);
+                    int studentId = Integer.parseInt(data[1]);
+                    int sessionId = Integer.parseInt(data[2]);
+                    String date = data[3];
+                    boolean present = Boolean.parseBoolean(data[4]);
+                    
+                    // Find student and session
+                    Student student = null;
+                    Session session = null;
+                    
+                    for (Student s : students) {
+                        if (s.getStudentID() == studentId) {
+                            student = s;
+                            break;
+                        }
+                    }
+                    
+                    for (Session s : sessions) {
+                        if (s.getSessionID() == sessionId) {
+                            session = s;
+                            break;
+                        }
+                    }
+                    
+                    if (student != null && session != null) {
+                        Attendance attendance = new Attendance(student, session, present);
+                        attendance.setDate(date);
+                        attendanceList.add(attendance);
+                    }
+                }
+            }
+            reader.close();
+            input.close();
+            
+        } catch (IOException e) {
+            System.err.println("Error loading attendance: " + e.getMessage());
+        }
+        return attendanceList;
+    }
+
+    public static void saveAttendance(ArrayList<Attendance> attendanceList) {
+        try {
+            DataOutputStream output = new DataOutputStream(new FileOutputStream(ATTENDANCE_FILE));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
+            
+            for (Attendance attendance : attendanceList) {
+                String line = attendance.getAttendanceId() + "," + 
+                              attendance.getStudent().getStudentID() + "," + 
+                              attendance.getSession().getSessionID() + "," + 
+                              attendance.getDate() + "," +
+                              attendance.isPresent();
+                writer.write(line);
+                writer.newLine();
+            }
+            
+            writer.close();
+            output.close();
+            
+        } catch (IOException e) {
+            System.err.println("Error saving attendance: " + e.getMessage());
         }
     }
 }
