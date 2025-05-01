@@ -225,12 +225,7 @@ public class FileDataStore {
         return loadEnrollments();
     }
 
-    /**
-     * Load enrollments without requiring parameters. This method will load all
-     * students and modules first, then load enrollments.
-     *
-     * @return ArrayList of Enrollment objects
-     */
+    
     public static ArrayList<Enrollment> loadEnrollments() {
         ArrayList<Enrollment> enrollments = new ArrayList<>();
         try {
