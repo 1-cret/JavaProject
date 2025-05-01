@@ -78,7 +78,7 @@ public class SplashScreen extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(51, 153, 255));
 
         splashScreenProgressBar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        splashScreenProgressBar.setForeground(new java.awt.Color(0, 0, 0));
+        splashScreenProgressBar.setForeground(new java.awt.Color(51, 102, 255));
         splashScreenProgressBar.setBorderPainted(false);
         splashScreenProgressBar.setStringPainted(true);
 
