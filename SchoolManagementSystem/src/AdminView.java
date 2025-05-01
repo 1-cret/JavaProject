@@ -107,6 +107,7 @@ public class AdminView extends javax.swing.JFrame {
         AdminAddStudentBtn = new javax.swing.JButton();
         AdminUpdateStudentBtn = new javax.swing.JButton();
         AdminDeleteBtn = new javax.swing.JButton();
+        assignModuleBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -262,7 +263,7 @@ public class AdminView extends javax.swing.JFrame {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 705, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
@@ -297,18 +298,28 @@ public class AdminView extends javax.swing.JFrame {
             }
         });
 
+        assignModuleBtn.setBackground(new java.awt.Color(51, 153, 255));
+        assignModuleBtn.setText("Assign Module");
+        assignModuleBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                assignModuleBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(123, Short.MAX_VALUE)
                 .addComponent(AdminAddStudentBtn)
                 .addGap(18, 18, 18)
                 .addComponent(AdminUpdateStudentBtn)
                 .addGap(18, 18, 18)
                 .addComponent(AdminDeleteBtn)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(assignModuleBtn)
+                .addContainerGap(130, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -317,7 +328,8 @@ public class AdminView extends javax.swing.JFrame {
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(AdminAddStudentBtn)
                     .addComponent(AdminUpdateStudentBtn)
-                    .addComponent(AdminDeleteBtn))
+                    .addComponent(AdminDeleteBtn)
+                    .addComponent(assignModuleBtn))
                 .addContainerGap())
         );
 
@@ -368,6 +380,10 @@ public class AdminView extends javax.swing.JFrame {
     private void AdminDeleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AdminDeleteBtnActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_AdminDeleteBtnActionPerformed
+
+    private void assignModuleBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_assignModuleBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_assignModuleBtnActionPerformed
 
     /**
      * Set up button listeners
@@ -3130,20 +3146,15 @@ public class AdminView extends javax.swing.JFrame {
     private javax.swing.JButton adminLogoutBtn;
     private javax.swing.JLabel adminSidebardBtn;
     private javax.swing.JLabel assessmentSidebardBtn;
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnLogout1;
+    private javax.swing.JButton assignModuleBtn;
     private javax.swing.JLabel classroomSidebardBtn;
     private javax.swing.JLabel enrollmentSidebardBtn;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblWelcome;
-    private javax.swing.JLabel lblWelcome1;
     private javax.swing.JLabel lblWelcome2;
     private javax.swing.JLabel moduleSidebardBtn;
     private javax.swing.JLabel paymentSidebardBtn;
