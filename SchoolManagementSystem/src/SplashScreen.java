@@ -25,7 +25,7 @@ public class SplashScreen extends javax.swing.JFrame {
     }
 
     private void startApp() {
-        StudentLogin login = new StudentLogin();
+        Login login = new Login();
         login.setVisible(true);
         this.dispose();
     }

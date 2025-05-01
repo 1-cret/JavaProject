@@ -11,14 +11,12 @@ import javax.swing.JFrame;
  *
  * @author omarhashad
  */
-public class StudentLogin extends javax.swing.JFrame {
-
-    private int counter = 1;
+public class Login extends javax.swing.JFrame {
 
     /**
      * Creates new form StudentLogin
      */
-    public StudentLogin() {
+    public Login() {
         initComponents();
         this.setLocationRelativeTo(null);
     }
@@ -207,61 +205,63 @@ public class StudentLogin extends javax.swing.JFrame {
         return null;
     }
 
+    private int counter = 0;
+    private boolean loggedIn = false;
+
     private void LoginBtnActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_LoginBtnActionPerformed
         String email = LoginEmailField.getText();
         String password = new String(LoginPasswordField.getPassword());
         String role = (String) LoginRoleComboBox.getSelectedItem();
-        if (counter == 2) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
-            javax.swing.JOptionPane.showMessageDialog(null, "You have one attempt left.", "Warning", javax.swing.JOptionPane.WARNING_MESSAGE);
-        }  if (counter == 3) {
-            javax.swing.JOptionPane.showMessageDialog(null, "You have exceeded the maximum number of login attempts!\nYour account has been temporarily locked.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-            this.dispose();
-            return;
-        } else {
-            if (role.equals("Student")) {
-                Student s = studentLogin(email, password);
-                if (s == null) {
-                    counter++;
-                    javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
-                } else {
 
+        if (role.equals("Select User Type ...")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please select a role.", "Invalid Role", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+//        if (counter >= 3) {
+//            javax.swing.JOptionPane.showMessageDialog(this, "You have exceeded the maximum number of login attempts!\nYour account has been temporarily locked.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+//            this.dispose();
+//        }
+        switch (role) {
+            case "Student":
+                Student s = studentLogin(email, password);
+                if (s != null) {
                     StudentView studentView = new StudentView(s);
                     studentView.setVisible(true);
                     this.dispose();
+                    loggedIn = true;
                 }
-            } else if (role.equals("Teacher")) {
+                break;
+            case "Teacher":
                 Teacher t = teacherLogin(email, password);
-                if (t == null) {
-                    counter++;
-                    javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
-
-                } else {
-                    if (t.getRole().equals("teacher")) {
-                        TeacherView teacher = new TeacherView(t);
-                        teacher.setVisible(true);
-                        this.dispose();
-                    }
+                if (t != null && t.getRole().equals("teacher")) {
+                    TeacherView teacher = new TeacherView(t);
+                    teacher.setVisible(true);
+                    this.dispose();
+                    loggedIn = true;
                 }
-
-            } else if (role.equals("Admin")) {
+                break;
+            case "Admin":
                 Admin a = adminLogin(email, password);
-                if (a == null) {
-                    counter++;
-                    javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
-
-                } else {
-                    if (a.getRole().equals("admin")) {
-                        AdminView admin = new AdminView();
-                        admin.setVisible(true);
-                        this.dispose();
-                    } else {
-                        javax.swing.JOptionPane.showMessageDialog(this, "Invalid Data");
-
-                    }
+                if (a != null && a.getRole().equals("admin")) {
+                    AdminView admin = new AdminView();
+                    admin.setVisible(true);
+                    this.dispose();
+                    loggedIn = true;
                 }
+                break;
+        }
+
+        if (!loggedIn) {
+            counter++;
+            if (counter == 3) {
+                javax.swing.JOptionPane.showMessageDialog(this, "You have exceeded the maximum number of login attempts!\nYour account has been temporarily locked.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                this.dispose();
+            } else if (counter == 2) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password!", "Access Denied!", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(this, "You have one attempt left.", "Warning", javax.swing.JOptionPane.WARNING_MESSAGE);
             } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Please select a role");
+                javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password!", "Access Denied!", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             }
         }
 
@@ -288,24 +288,25 @@ public class StudentLogin extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(StudentLogin.class.getName()).log(java.util.logging.Level.SEVERE, null,
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null,
                     ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(StudentLogin.class.getName()).log(java.util.logging.Level.SEVERE, null,
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null,
                     ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(StudentLogin.class.getName()).log(java.util.logging.Level.SEVERE, null,
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null,
                     ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(StudentLogin.class.getName()).log(java.util.logging.Level.SEVERE, null,
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null,
                     ex);
         }
+        // </editor-fold>
         // </editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new StudentLogin().setVisible(true);
+                new Login().setVisible(true);
             }
         });
     }
