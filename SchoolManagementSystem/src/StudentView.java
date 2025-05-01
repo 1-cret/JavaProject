@@ -244,6 +244,7 @@ public class StudentView extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tblCourses.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(tblCourses);
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
