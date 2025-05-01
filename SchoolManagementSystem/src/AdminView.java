@@ -381,8 +381,8 @@ public class AdminView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_AdminDeleteBtnActionPerformed
 
-    private void assignModuleBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_assignModuleBtnActionPerformed
-        // TODO add your handling code here:
+    private void assignModuleBtnActionPerformed(java.awt.event.ActionEvent evt) {
+        assignModuleToTeacher();
     }//GEN-LAST:event_assignModuleBtnActionPerformed
 
     /**
@@ -609,6 +609,9 @@ public class AdminView extends javax.swing.JFrame {
      * @param category The current selected category
      */
     private void updateButtonLabels(String category) {
+        // First hide the Assign Module button by default
+        assignModuleBtn.setVisible(false);
+        
         switch (category) {
             case "Students":
                 AdminAddStudentBtn.setText("Add Student");
@@ -619,6 +622,9 @@ public class AdminView extends javax.swing.JFrame {
                 AdminAddStudentBtn.setText("Add Teacher");
                 AdminUpdateStudentBtn.setText("Update Teacher");
                 AdminDeleteBtn.setText("Delete Teacher");
+                // Show Assign Module button only for Teachers
+                assignModuleBtn.setText("Assign Module");
+                assignModuleBtn.setVisible(true);
                 break;
             case "Modules":
                 AdminAddStudentBtn.setText("Add Module");
