@@ -54,6 +54,9 @@ public class Enrollment implements IEnrollment, Serializable {
     public Status getEnrollmentStatus() {
         return enrollmentStatus;
     }
+    public void setEnrollmentStatus(Status enrollmentStatus) {
+        this.enrollmentStatus = enrollmentStatus;
+    }
 
     public void generateReports(ArrayList<Enrollment> enrollments, Module module) {
         int enrolledStudents = 0;
