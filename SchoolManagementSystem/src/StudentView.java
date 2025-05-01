@@ -20,9 +20,7 @@ public class StudentView extends javax.swing.JFrame {
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
-    /**
-     * Creates new form StudentView with student data
-     */
+  
     public StudentView(Student student) {
         initComponents();
         setLocationRelativeTo(null);
@@ -32,9 +30,7 @@ public class StudentView extends javax.swing.JFrame {
 
     }
 
-    /**
-     * Display student information in the GUI
-     */
+    
     private void displayStudentInfo() {
         if (currentStudent != null) {
             lblStudentID.setText(String.valueOf(currentStudent.getStudentID()));
@@ -46,9 +42,7 @@ public class StudentView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Load courses the student is enrolled in
-     */
+   
     private void loadEnrolledCourses() {
         DefaultTableModel model = (DefaultTableModel) tblCourses.getModel();
         model.setRowCount(0); 

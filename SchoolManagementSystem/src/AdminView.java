@@ -383,11 +383,9 @@ public class AdminView extends javax.swing.JFrame {
 
     private void assignModuleBtnActionPerformed(java.awt.event.ActionEvent evt) {
         assignModuleToTeacher();
-    }//GEN-LAST:event_assignModuleBtnActionPerformed
+    }                                               
 
-    /**
-     * Set up button listeners
-     */
+  
     private void setupButtonListeners() {
         AdminAddStudentBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -408,11 +406,7 @@ public class AdminView extends javax.swing.JFrame {
         });
     }
 
-    /**
-     * Handle add action based on the selected category
-     *
-     * @param category The current selected category
-     */
+    
     private void handleAddAction(String category) {
         switch (category) {
             case "Students":
@@ -447,11 +441,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Handle update action based on the selected category
-     *
-     * @param category The current selected category
-     */
+   
     private void handleUpdateAction(String category) {
         int selectedRow = tblStudents.getSelectedRow();
         if (selectedRow == -1) {
@@ -495,11 +485,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
     
-    /**
-     * Handle delete action based on the selected category
-     *
-     * @param category The current selected category
-     */
+   
     private void handleDeleteAction(String category) {
         int selectedRow = tblStudents.getSelectedRow();
         if (selectedRow == -1) {
@@ -543,9 +529,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Set up visual effects for sidebar items
-     */
+ 
     private void setupSidebarEffects() {
         javax.swing.JLabel[] labels = {
             studentSidebardBtn, adminSidebardBtn, teacherSidebardBtn, 
@@ -583,11 +567,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Set the selected sidebar item
-     * 
-     * @param label The sidebar label to set as selected
-     */
+  
     private void setSelectedSidebarItem(javax.swing.JLabel label) {
         if (selectedLabel != null) {
             selectedLabel.setBackground(DEFAULT_COLOR);
@@ -603,11 +583,7 @@ public class AdminView extends javax.swing.JFrame {
         updateButtonLabels(label.getText());
     }
 
-    /**
-     * Update button labels based on the selected category
-     * 
-     * @param category The current selected category
-     */
+  
     private void updateButtonLabels(String category) {
         // First hide the Assign Module button by default
         assignModuleBtn.setVisible(false);
@@ -666,11 +642,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Update the main panel content based on the selected category
-     * 
-     * @param category The category to display
-     */
+  
     private void updateMainPanel(String category) {
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblStudents.getModel();
         model.setRowCount(0);
@@ -835,9 +807,7 @@ public class AdminView extends javax.swing.JFrame {
         jPanel7.repaint();
     }
 
-    /**
-     * Add a new student
-     */
+  
     private void addStudent() {
         String name = JOptionPane.showInputDialog(this, "Enter student name:");
         if (name == null || name.trim().isEmpty()) {
@@ -894,11 +864,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Update an existing student
-     *
-     * @param selectedRow The selected row in the table
-     */
+    
     private void updateStudent(int selectedRow) {
         try {
             int studentId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -984,11 +950,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Delete a student
-     *
-     * @param selectedRow The selected row in the table
-     */
+    
     private void deleteStudent(int selectedRow) {
         try {
             int studentId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -1090,9 +1052,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Add a new teacher
-     */
+    
     private void addTeacher() {
         String name = JOptionPane.showInputDialog(this, "Enter teacher name:");
         if (name == null || name.trim().isEmpty()) {
@@ -1145,11 +1105,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Update an existing teacher
-     *
-     * @param selectedRow The selected row in the table
-     */
+  
     private void updateTeacher(int selectedRow) {
         try {
             int teacherId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -1272,11 +1228,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Assign a module to a teacher
-     * 
-     * This method is specific to the Teachers view
-     */
+  
     private void assignModuleToTeacher() {
         try {
             int selectedRow = tblStudents.getSelectedRow();
@@ -1362,9 +1314,6 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Add a new module
-     */
     private void addModule() {
         String moduleName = JOptionPane.showInputDialog(this, "Enter module name:");
         if (moduleName == null || moduleName.trim().isEmpty()) {
@@ -1411,11 +1360,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Update an existing module
-     *
-     * @param selectedRow The selected row in the table
-     */
+
     private void updateModule(int selectedRow) {
         try {
             int moduleId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -1485,11 +1430,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Delete a module
-     *
-     * @param selectedRow The selected row in the table
-     */
+   
     private void deleteModule(int selectedRow) {
         try {
             int moduleId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -1591,9 +1532,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Add a new admin
-     */
+   
     private void addAdmin() {
         String name = JOptionPane.showInputDialog(this, "Enter admin name:");
         if (name == null || name.trim().isEmpty()) {
@@ -1646,11 +1585,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Update an existing admin
-     *
-     * @param selectedRow The selected row in the table
-     */
+
     private void updateAdmin(int selectedRow) {
         try {
             int adminId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -1727,11 +1662,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Delete an admin
-     *
-     * @param selectedRow The selected row in the table
-     */
+  
     private void deleteAdmin(int selectedRow) {
         try {
             int adminId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -1773,9 +1704,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Add a new assessment
-     */
+
     private void addAssessment() {
         if (modules.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -1860,11 +1789,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Update an existing assessment
-     *
-     * @param selectedRow The selected row in the table
-     */
+
     private void updateAssessment(int selectedRow) {
         try {
             int assessmentId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -1981,11 +1906,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Delete an assessment
-     *
-     * @param selectedRow The selected row in the table
-     */
+   
     private void deleteAssessment(int selectedRow) {
         try {
             int assessmentId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -2032,9 +1953,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Add a new payment
-     */
+
     private void addPayment() {
         if (students.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -2121,11 +2040,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Update an existing payment
-     *
-     * @param selectedRow The selected row in the table
-     */
+
     private void updatePayment(int selectedRow) {
         try {
             int paymentId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -2195,11 +2110,6 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Delete a payment
-     *
-     * @param selectedRow The selected row in the table
-     */
     private void deletePayment(int selectedRow) {
         try {
             int paymentId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -2241,9 +2151,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Add a new session
-     */
+   
     private void addSession() {
         if (modules.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -2370,11 +2278,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Update an existing session
-     *
-     * @param selectedRow The selected row in the table
-     */
+  
     private void updateSession(int selectedRow) {
         try {
             int sessionId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -2514,11 +2418,6 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Delete a session
-     *
-     * @param selectedRow The selected row in the table
-     */
     private void deleteSession(int selectedRow) {
         try {
             int sessionId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -2560,9 +2459,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Add a new classroom
-     */
+
     private void addClassroom() {
         String roomName = JOptionPane.showInputDialog(this, "Enter classroom name:");
         if (roomName == null || roomName.trim().isEmpty()) {
@@ -2606,11 +2503,6 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Update an existing classroom
-     *
-     * @param selectedRow The selected row in the table
-     */
     private void updateClassroom(int selectedRow) {
         try {
             int classroomId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -2678,11 +2570,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Delete a classroom
-     *
-     * @param selectedRow The selected row in the table
-     */
+
     private void deleteClassroom(int selectedRow) {
         try {
             int classroomId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -2754,9 +2642,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
     
-    /**
-     * Add a new enrollment
-     */
+
     private void addEnrollment() {
         if (students.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -2903,11 +2789,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Update an existing enrollment
-     *
-     * @param selectedRow The selected row in the table
-     */
+ 
     private void updateEnrollment(int selectedRow) {
         try {
             int enrollmentId = (int) tblStudents.getValueAt(selectedRow, 0);
@@ -3064,11 +2946,6 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Delete an enrollment
-     *
-     * @param selectedRow The selected row in the table
-     */
     private void deleteEnrollment(int selectedRow) {
         try {
             int enrollmentId = (int) tblStudents.getValueAt(selectedRow, 0);
