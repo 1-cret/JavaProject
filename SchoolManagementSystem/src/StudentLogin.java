@@ -13,6 +13,8 @@ import javax.swing.JFrame;
  */
 public class StudentLogin extends javax.swing.JFrame {
 
+    private int counter = 1;
+
     /**
      * Creates new form StudentLogin
      */
@@ -174,11 +176,11 @@ public class StudentLogin extends javax.swing.JFrame {
         students = FileDataStore.loadStudents();
         for (Student student : students) {
             if (student.getEmail().equals(email) && student.getPassword().equals(password)) {
-                
+
                 return student;
             }
         }
-        return null; 
+        return null;
     }
 
     Teacher teacherLogin(String email, String password) {
@@ -186,11 +188,11 @@ public class StudentLogin extends javax.swing.JFrame {
         teachers = FileDataStore.loadTeachers();
         for (Teacher teacher : teachers) {
             if (teacher.getEmail().equals(email) && teacher.getPassword().equals(password)) {
-                
+
                 return teacher;
             }
         }
-        return null; 
+        return null;
     }
 
     Admin adminLogin(String email, String password) {
@@ -198,56 +200,71 @@ public class StudentLogin extends javax.swing.JFrame {
         admins = FileDataStore.loadAdmins();
         for (Admin admin : admins) {
             if (admin.getEmail().equals(email) && admin.getPassword().equals(password)) {
-                
+
                 return admin;
             }
         }
-        return null; 
+        return null;
     }
 
     private void LoginBtnActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_LoginBtnActionPerformed
         String email = LoginEmailField.getText();
         String password = new String(LoginPasswordField.getPassword());
         String role = (String) LoginRoleComboBox.getSelectedItem();
+        if (counter == 2) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
+            javax.swing.JOptionPane.showMessageDialog(null, "You have one attempt left.", "Warning", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }  if (counter == 3) {
 
-        if (role.equals("Student")) {
-            Student s = studentLogin(email, password);
-            if (s == null) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
-            } else {
-                
-                StudentView studentView = new StudentView(s);
-                studentView.setVisible(true);
-                this.dispose(); 
-            }
-        } else if (role.equals("Teacher")) {
-            Teacher t = teacherLogin(email, password);
-            if (t == null) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
-            } else {
-                if (t.getRole().equals("teacher")) {
-                    TeacherView teacher = new TeacherView(t);
-                    teacher.setVisible(true);
-                    this.dispose();
-                }
-            }
-
-        } else if (role.equals("Admin")) {
-            Admin a = adminLogin(email, password);
-            if (a == null) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
-            } else {
-                if (a.getRole().equals("admin")) {
-                    AdminView admin = new AdminView();
-                    admin.setVisible(true);
-                    this.dispose();
-                } else {
-                    javax.swing.JOptionPane.showMessageDialog(this, "Invalid Data");
-
-                }
-            }
+            javax.swing.JOptionPane.showMessageDialog(null, "You have exceeded the maximum number of login attempts!\nYour account has been temporarily locked.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            this.dispose();
+            return;
         } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Please select a role");
+            if (role.equals("Student")) {
+                Student s = studentLogin(email, password);
+                if (s == null) {
+                    counter++;
+                    javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
+                } else {
+
+                    StudentView studentView = new StudentView(s);
+                    studentView.setVisible(true);
+                    this.dispose();
+                }
+            } else if (role.equals("Teacher")) {
+                Teacher t = teacherLogin(email, password);
+                if (t == null) {
+                    counter++;
+                    javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
+
+                } else {
+                    if (t.getRole().equals("teacher")) {
+                        TeacherView teacher = new TeacherView(t);
+                        teacher.setVisible(true);
+                        this.dispose();
+                    }
+                }
+
+            } else if (role.equals("Admin")) {
+                Admin a = adminLogin(email, password);
+                if (a == null) {
+                    counter++;
+                    javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
+
+                } else {
+                    if (a.getRole().equals("admin")) {
+                        AdminView admin = new AdminView();
+                        admin.setVisible(true);
+                        this.dispose();
+                    } else {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Invalid Data");
+
+                    }
+                }
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Please select a role");
+            }
         }
 
     }// GEN-LAST:event_LoginBtnActionPerformed
