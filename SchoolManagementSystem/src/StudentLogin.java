@@ -214,9 +214,7 @@ public class StudentLogin extends javax.swing.JFrame {
         if (counter == 2) {
             javax.swing.JOptionPane.showMessageDialog(this, "Invalid email or password");
             javax.swing.JOptionPane.showMessageDialog(null, "You have one attempt left.", "Warning", javax.swing.JOptionPane.WARNING_MESSAGE);
-            return;
         }  if (counter == 3) {
-
             javax.swing.JOptionPane.showMessageDialog(null, "You have exceeded the maximum number of login attempts!\nYour account has been temporarily locked.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             this.dispose();
             return;
