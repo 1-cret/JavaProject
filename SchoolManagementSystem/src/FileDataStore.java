@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class FileDataStore {
 
-    private static final String DATA_DIRECTORY = "data/";
+    private static final String DATA_DIRECTORY = "src/data/";
     private static final String STUDENTS_FILE = DATA_DIRECTORY + "students.txt";
     private static final String MODULES_FILE = DATA_DIRECTORY + "modules.txt";
     private static final String CLASSROOMS_FILE = DATA_DIRECTORY + "classrooms.txt";
