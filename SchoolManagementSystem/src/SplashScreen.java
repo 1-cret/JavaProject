@@ -1,8 +1,14 @@
+
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
+import javax.swing.UIManager;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author Omayr
@@ -15,6 +21,32 @@ public class SplashScreen extends javax.swing.JFrame {
     public SplashScreen() {
         initComponents();
         this.setLocationRelativeTo(null);
+        fill();
+    }
+
+    private void startApp() {
+        StudentLogin login = new StudentLogin();
+        login.setVisible(true);
+        this.dispose();
+    }
+
+    public void fill() {
+        Timer timer = new Timer(25, new ActionListener() {
+        int progress = 0;
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            progress++;
+            splashScreenProgressBar.setValue(progress);
+            splashScreenProgressBar.setString(progress + "%");
+            
+            if (progress > 100) {
+                ((Timer)e.getSource()).stop();
+                startApp();
+            }
+        }
+    });
+    timer.start();
     }
 
     /**
@@ -30,7 +62,7 @@ public class SplashScreen extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jProgressBar1 = new javax.swing.JProgressBar();
+        splashScreenProgressBar = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -45,21 +77,26 @@ public class SplashScreen extends javax.swing.JFrame {
 
         jPanel2.setBackground(new java.awt.Color(51, 153, 255));
 
+        splashScreenProgressBar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        splashScreenProgressBar.setForeground(new java.awt.Color(0, 0, 0));
+        splashScreenProgressBar.setBorderPainted(false);
+        splashScreenProgressBar.setStringPainted(true);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap(90, Short.MAX_VALUE)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(splashScreenProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(90, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(17, 17, 17)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addComponent(splashScreenProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -142,6 +179,6 @@ public class SplashScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JProgressBar jProgressBar1;
+    private javax.swing.JProgressBar splashScreenProgressBar;
     // End of variables declaration//GEN-END:variables
 }
