@@ -1,8 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -50,9 +45,6 @@ public class AdminView extends javax.swing.JFrame {
         setupButtonListeners();
     }
 
-    /**
-     * Load all data from files using FileDataStore
-     */
     private void loadAllData() {
         try {
             students = FileDataStore.loadStudents();
@@ -585,7 +577,6 @@ public class AdminView extends javax.swing.JFrame {
 
   
     private void updateButtonLabels(String category) {
-        // First hide the Assign Module button by default
         assignModuleBtn.setVisible(false);
         
         switch (category) {
@@ -598,7 +589,6 @@ public class AdminView extends javax.swing.JFrame {
                 AdminAddStudentBtn.setText("Add Teacher");
                 AdminUpdateStudentBtn.setText("Update Teacher");
                 AdminDeleteBtn.setText("Delete Teacher");
-                // Show Assign Module button only for Teachers
                 assignModuleBtn.setText("Assign Module");
                 assignModuleBtn.setVisible(true);
                 break;
@@ -1182,11 +1172,7 @@ public class AdminView extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Delete a teacher
-     *
-     * @param selectedRow The selected row in the table
-     */
+
     private void deleteTeacher(int selectedRow) {
         try {
             int teacherId = (int) tblStudents.getValueAt(selectedRow, 0);
