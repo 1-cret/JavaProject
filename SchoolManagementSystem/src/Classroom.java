@@ -1,24 +1,25 @@
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Classroom implements Serializable {
 
+    private static int ClassroomCounter = 0;
     private static final long serialVersionUID = 1L;
-    private static int classroomCounter = 0;
     private int classroomId;
     private String roomName;
     private int capacity;
     private String resources;
 
+    public Classroom(int classroomId) {
+        this.classroomId = classroomId;
+    }
+
     public Classroom(String roomName, int capacity) {
         this.roomName = roomName;
         this.capacity = capacity;
-        this.classroomId = classroomCounter++;
         this.resources = "";
-    }
-
-    public Classroom(int classroomId) {
-        this.classroomId = classroomId;
+        this.classroomId = ClassroomCounter++;
     }
 
     public int getClassroomId() {

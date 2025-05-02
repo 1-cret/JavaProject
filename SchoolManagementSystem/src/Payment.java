@@ -2,9 +2,8 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Payment implements Serializable {
-
+    private static int enrollmentCounter = 0;
     private static final long serialVersionUID = 1L;
-    private static int paymentCounter = 0;
     private int paymentID;
     private float amount;
     private Student student;
@@ -20,7 +19,6 @@ public class Payment implements Serializable {
         this.student = student;
         this.description = description;
         this.date = date;
-        this.paymentID = paymentCounter++;
     }
 
     public int getPaymentID() {

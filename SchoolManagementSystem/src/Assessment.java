@@ -1,21 +1,20 @@
+
 import java.io.Serializable;
 import java.util.Date;
 
 public class Assessment implements Serializable {
-    private static final long serialVersionUID = 1L;
     private static int assessmentCounter = 0;
+    private static final long serialVersionUID = 1L;
     private int assessmentID;
     private Date date;
     private String duration;
     private String title;
     private Module module;
 
-    
     public Assessment(int assessmentID) {
         this.assessmentID = assessmentID;
     }
 
-    
     public Assessment(int assessmentID, Date date, String duration, Module module, String title) {
         this.assessmentID = assessmentID;
         this.date = date;
@@ -29,7 +28,6 @@ public class Assessment implements Serializable {
         return assessmentID;
     }
 
-    
     public void setDate(Date date) {
         this.date = date;
     }
@@ -38,7 +36,6 @@ public class Assessment implements Serializable {
         return date;
     }
 
-    
     public void setDuration(String duration) {
         this.duration = duration;
     }
@@ -47,7 +44,6 @@ public class Assessment implements Serializable {
         return duration;
     }
 
-    
     public void setModule(Module module) {
         this.module = module;
     }
@@ -56,7 +52,6 @@ public class Assessment implements Serializable {
         return module;
     }
 
-    
     public void setTitle(String title) {
         this.title = title;
     }

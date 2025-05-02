@@ -2,9 +2,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Student implements Serializable {
-
-    private static final long serialVersionUID = 1L;
     private static int studentCounter = 0;
+    private static final long serialVersionUID = 1L;
     private int studentID;
     private String name;
     private String email;
@@ -24,7 +23,7 @@ public class Student implements Serializable {
         this.password = password;
         this.studentID = studentCounter++;
     }
-
+    
     public String getPassword() {
         return password;
     }
@@ -105,9 +104,5 @@ public class Student implements Serializable {
         }
 
         FileDataStore.saveStudents(students);
-    }
-
-    public boolean login() {
-        return true;
     }
 }

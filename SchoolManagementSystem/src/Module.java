@@ -2,9 +2,8 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Module implements Serializable {
-
-    private static final long serialVersionUID = 1L;
     private static int moduleCounter = 0;
+    private static final long serialVersionUID = 1L;
     private int moduleID;
     private String moduleName;
     private int maxCapacity;

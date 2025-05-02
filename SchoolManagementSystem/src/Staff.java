@@ -1,9 +1,8 @@
 import java.io.Serializable;
 
 public class Staff implements Serializable {
-
-    private static final long serialVersionUID = 1L;
     private static int staffCounter = 0;
+    private static final long serialVersionUID = 1L;
     private int staffId;
     private String name;
     private String email;
@@ -66,13 +65,6 @@ public class Staff implements Serializable {
 
     public void setStatus(StaffStatus status) {
         this.status = status;
-    }
-
-    public boolean login() {
-        return true;
-    }
-
-    public void logout() {
     }
 }
 

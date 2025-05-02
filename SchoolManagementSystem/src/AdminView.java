@@ -102,6 +102,7 @@ public class AdminView extends javax.swing.JFrame {
         assignModuleBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Admin Dashboard");
 
         jPanel3.setBackground(new java.awt.Color(51, 153, 255));
 

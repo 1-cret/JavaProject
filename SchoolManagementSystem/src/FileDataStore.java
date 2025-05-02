@@ -293,36 +293,4 @@ public class FileDataStore {
             System.err.println("Error saving payments: " + e.getMessage());
         }
     }
-
-    public static ArrayList<Attendance> loadAttendance() {
-        ArrayList<Attendance> attendanceList = new ArrayList<>();
-        try {
-            File file = new File(ATTENDANCE_FILE);
-            if (!file.exists()) {
-                return attendanceList;
-            }
-
-            FileInputStream fis = new FileInputStream(file);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            attendanceList = (ArrayList<Attendance>) ois.readObject();
-            ois.close();
-            fis.close();
-
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Error loading attendance: " + e.getMessage());
-        }
-        return attendanceList;
-    }
-
-    public static void saveAttendance(ArrayList<Attendance> attendanceList) {
-        try {
-            FileOutputStream fos = new FileOutputStream(ATTENDANCE_FILE);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(attendanceList);
-            oos.close();
-            fos.close();
-        } catch (IOException e) {
-            System.err.println("Error saving attendance: " + e.getMessage());
-        }
-    }
 }
